@@ -1,16 +1,20 @@
 package rest.api.rest_service.entity;
 
+
 public class CompanyEntity {
 
     private final Long id;
     private final String name;
-    private final String phone;
+    private final String address;
+
+    // Many-to-One
+    private StaffEntity staff;
 
 
     private CompanyEntity(CompanyEntityBuilder builder) {
         this.id = builder.id;
         this.name = builder.name;
-        this.phone = builder.phone;
+        this.address = builder.address;
     }
 
 
@@ -22,14 +26,14 @@ public class CompanyEntity {
         return name;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getAddress() {
+        return address;
     }
 
     public static class CompanyEntityBuilder {
         private Long id;
         private String name;
-        private String phone;
+        private String address;
 
         public CompanyEntityBuilder() {
         }
@@ -44,8 +48,8 @@ public class CompanyEntity {
             return this;
         }
 
-        public CompanyEntityBuilder phone(String phone) {
-            this.phone = phone;
+        public CompanyEntityBuilder address(String address) {
+            this.address = address;
             return this;
         }
 

@@ -1,4 +1,6 @@
-package rest.api.rest_service.util;
+package rest.api.rest_service.db;
+
+import rest.api.rest_service.util.PropertiesUtil;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
@@ -47,7 +49,6 @@ public final class ConnectionManager {
             throw new RuntimeException(e);
         }
     }
-
 
     private static Connection open() {
         try {

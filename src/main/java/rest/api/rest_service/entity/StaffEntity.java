@@ -1,10 +1,16 @@
 package rest.api.rest_service.entity;
 
+
+
 public class StaffEntity {
 
     private final int id;
     private final String firstName;
     private final String lastName;
+
+    // Many-to-One
+    private PostEntity post;
+    private CompanyEntity company;
 
     private StaffEntity(StaffEntityBuilder builder) {
         this.id = builder.id;

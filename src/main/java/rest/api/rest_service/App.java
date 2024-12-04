@@ -1,11 +1,12 @@
 package rest.api.rest_service;
 
-import rest.api.rest_service.util.ConnectionManager;
+import rest.api.rest_service.db.ConnectionManager;
+import rest.api.rest_service.util.ExecuteSQLUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class Main {
+public class App {
 
     public static void checkMetaData() {
         try (Connection connection = ConnectionManager.get()) {
@@ -27,5 +28,6 @@ public class Main {
 
     public static void main(String[] args) {
         checkMetaData();
+        ExecuteSQLUtil.executeScriptSQL();
     }
 }
