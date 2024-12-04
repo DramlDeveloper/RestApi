@@ -14,6 +14,9 @@ target/
 *.ipr
 
 ### Eclipse ###
+.mvnw
+.mvn
+.mvnw.cmd
 .apt_generated
 .classpath
 .factorypath
