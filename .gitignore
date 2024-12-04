@@ -15,7 +15,7 @@ target/
 
 ### Eclipse ###
 .mvnw
-.mvn
+.mvngit rm --cached .idea/
 .mvnw.cmd
 .apt_generated
 .classpath
