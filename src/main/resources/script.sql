@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS company
 (
-    id   bigserial PRIMARY KEY,
-    name varchar NOT NULL
+    id      bigserial PRIMARY KEY,
+    name    varchar(150) NOT NULL,
+    address varchar(256)
 );
 
 CREATE TABLE IF NOT EXISTS post

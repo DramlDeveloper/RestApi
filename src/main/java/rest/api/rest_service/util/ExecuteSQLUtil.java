@@ -24,7 +24,7 @@ public final class ExecuteSQLUtil {
             var script = new String(Objects.requireNonNull(fileSql).readAllBytes(), StandardCharsets.UTF_8);
             statement.execute(script);
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error while executing script", e);
         }
     }
 }
