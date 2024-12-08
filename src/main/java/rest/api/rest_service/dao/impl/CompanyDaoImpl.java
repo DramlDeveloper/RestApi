@@ -1,27 +1,27 @@
-package rest.api.rest_service.repository.impl;
+package rest.api.rest_service.dao.impl;
 
 
 import rest.api.rest_service.entity.CompanyEntity;
 import rest.api.rest_service.exception.RepositoryException;
 import rest.api.rest_service.db.ConnectionManager;
-import rest.api.rest_service.repository.Repository;
+import rest.api.rest_service.dao.Dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
-public class CompanyRepositoryImpl implements Repository<CompanyEntity, Long> {
-    //private ResultSetMapper resultSetMapper;
+public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
 
-    private static final CompanyRepositoryImpl INSTANCE = new CompanyRepositoryImpl();
+    private static final CompanyDaoImpl INSTANCE = new CompanyDaoImpl();
 
-    public static CompanyRepositoryImpl getInstance() {
+    public static CompanyDaoImpl getInstance() {
         return INSTANCE;
     }
 
-    private CompanyRepositoryImpl() {
+    private CompanyDaoImpl() {
     }
 
     private final static String SAVE_SQL = """
@@ -79,6 +79,39 @@ public class CompanyRepositoryImpl implements Repository<CompanyEntity, Long> {
             return Optional.ofNullable(company);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public List<CompanyEntity> findAll(CompanyEntity companyEntity, Connection connection) {
+        List<Object> parameters = new ArrayList<>();
+        List<String> whereSql = new ArrayList<>();
+        if(companyEntity.getName() != null){
+            parameters.add(companyEntity.getName());
+            whereSql.add("name = ?");
+        }
+        if (companyEntity.getAddress() != null) {
+            parameters.add(companyEntity.getAddress());
+            whereSql.add("address = ?");
+        }
+        String wSql = whereSql.stream().collect(Collectors.joining(
+                " AMD ",
+                " WHERE ",
+                " limit ? offset ?"
+        ));
+
+
+        String sql = FIND_ALL_SQL + wSql;
+        try (var connectionM = connection;
+             var statement = connection.prepareStatement(sql)) {
+            List<CompanyEntity> companyEntityList = new ArrayList<>();
+            var result = statement.executeQuery();
+            while (result.next()) {
+                companyEntityList.add(builderCompanyEntity(result)
+                );
+            }
+            return companyEntityList;
+        } catch (SQLException e) {
+            throw new RepositoryException(e);
         }
     }
 

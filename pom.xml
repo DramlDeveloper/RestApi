@@ -19,7 +19,7 @@
 
 
     <dependencies>
-        <!-- Dependency Jakarta servlet -->
+        <!-- Dependency Jakarta servlet; tomcat > 10.0 -->
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
@@ -37,6 +37,13 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.1.0</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- JSON  mapper -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
         </dependency>
 
         <!-- Test dependency -->

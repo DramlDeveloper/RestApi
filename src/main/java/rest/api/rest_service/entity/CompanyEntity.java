@@ -3,6 +3,7 @@ package rest.api.rest_service.entity;
 
 import java.util.Objects;
 
+
 public class CompanyEntity {
 
     private Long id;

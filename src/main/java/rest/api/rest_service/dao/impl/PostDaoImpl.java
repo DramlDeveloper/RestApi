@@ -1,22 +1,23 @@
-package rest.api.rest_service.repository.impl;
+package rest.api.rest_service.dao.impl;
 
 import rest.api.rest_service.entity.CompanyEntity;
-import rest.api.rest_service.repository.Repository;
+import rest.api.rest_service.dao.Dao;
 
 import java.util.List;
 import java.util.Optional;
 
 
-public class StaffRepositoryImpl implements Repository<CompanyEntity, Long> {
+public class PostDaoImpl implements Dao<CompanyEntity, Long> {
 
-    private final static StaffRepositoryImpl INSTANCE = new StaffRepositoryImpl();
+    private final static PostDaoImpl INSTANCE = new PostDaoImpl();
 
-    public static StaffRepositoryImpl getInstance() {
+    public static PostDaoImpl getInstance() {
         return INSTANCE;
     }
 
-    private StaffRepositoryImpl() {
+    private PostDaoImpl() {
     }
+
 
     @Override
     public Optional<CompanyEntity> findById(Long id) {

@@ -22,7 +22,17 @@ public final class ConnectionManager {
     }
 
     static {
+        loader();
         initConnectionPool();
+    }
+
+    private static void loader()  {
+        try {
+            Class.forName("org.postgresql.Driver");
+        }catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private static void initConnectionPool() {
