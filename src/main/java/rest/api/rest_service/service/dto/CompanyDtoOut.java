@@ -20,7 +20,7 @@ public class CompanyDtoOut {
     }
 
     public String getDescription() {
-        return description;
+       return description;
     }
 
     @Override

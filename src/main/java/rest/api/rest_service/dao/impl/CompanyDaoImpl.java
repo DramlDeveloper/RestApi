@@ -1,17 +1,17 @@
 package rest.api.rest_service.dao.impl;
 
-
-import rest.api.rest_service.entity.CompanyEntity;
-import rest.api.rest_service.exception.RepositoryException;
-import rest.api.rest_service.db.ConnectionManager;
 import rest.api.rest_service.dao.Dao;
+import rest.api.rest_service.db.ConnectionManager;
+import rest.api.rest_service.entity.CompanyEntity;
+import rest.api.rest_service.exception.DaoException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 
 public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
 
@@ -25,21 +25,21 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
     }
 
     private final static String SAVE_SQL = """
-            INSERT INTO company (name, address)
+            INSERT INTO company (name, city)
             VALUES (?, ?)
             """;
 
     private final static String FIND_BY_ID_SQL = """
-            SELECT id, name, address FROM company
+            SELECT id, name, city FROM company
             WHERE id = ?
             """;
     private final static String FIND_ALL_SQL = """
-            SELECT id, name, address FROM company
+            SELECT id, name, city FROM company
             """;
 
     private final static String UPDATE_SQL = """
             UPDATE company
-            SET name = ?, address = ? WHERE id = ?
+            SET name = ?, city = ? WHERE id = ?
             """;
 
     private final static String DELETE_SQL = """
@@ -52,24 +52,31 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
         try (var connection = ConnectionManager.get();
              var statement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, companyEntity.getName());
-            statement.setString(2, companyEntity.getAddress());
+            statement.setString(2, companyEntity.getCity());
             statement.executeUpdate();
             var keys = statement.getGeneratedKeys();
             if (keys.next()) {
                 companyEntity.setId(keys.getLong("id"));
             }
         } catch (SQLException e) {
-            throw new RepositoryException(e);
+            throw new DaoException("Сохранить не удалось проверьте верны ли параметры");
         }
         return companyEntity;
     }
 
     @Override
     public Optional<CompanyEntity> findById(Long id) {
+        try (var connection = ConnectionManager.get()) {
+            return findById(id, connection);
+        } catch (SQLException e) {
+            throw new DaoException("Найти не удалось проверьте верны ли параметры");
+        }
+    }
+
+    public Optional<CompanyEntity> findById(Long id, Connection connection) {
         CompanyEntity company = null;
         // Здесь используем try with resources
-        try (var connection = ConnectionManager.get();
-             var statement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+        try (var statement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             statement.setLong(1, id);
             var result = statement.executeQuery();
 
@@ -78,11 +85,12 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
             }
             return Optional.ofNullable(company);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException("Найти не удалось проверьте верны ли параметры");
         }
     }
 
-    public List<CompanyEntity> findAll(CompanyEntity companyEntity, Connection connection) {
+
+/*    public List<CompanyEntity> filter(CompanyEntity companyEntity, Connection connection) {
         List<Object> parameters = new ArrayList<>();
         List<String> whereSql = new ArrayList<>();
         if(companyEntity.getName() != null){
@@ -94,12 +102,10 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
             whereSql.add("address = ?");
         }
         String wSql = whereSql.stream().collect(Collectors.joining(
-                " AMD ",
+                " AND ",
                 " WHERE ",
                 " limit ? offset ?"
         ));
-
-
         String sql = FIND_ALL_SQL + wSql;
         try (var connectionM = connection;
              var statement = connection.prepareStatement(sql)) {
@@ -113,7 +119,7 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
         } catch (SQLException e) {
             throw new RepositoryException(e);
         }
-    }
+    }*/
 
     @Override
     public List<CompanyEntity> findAll() {
@@ -127,7 +133,7 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
             }
             return companyEntityList;
         } catch (SQLException e) {
-            throw new RepositoryException(e);
+            throw new DaoException("Данные отсутствуют");
         }
     }
 
@@ -136,11 +142,11 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
         try (Connection connection = ConnectionManager.get();
              var statement = connection.prepareStatement(UPDATE_SQL)) {
             statement.setString(1, company.getName());
-            statement.setString(2, company.getAddress());
+            statement.setString(2, company.getCity());
             statement.setLong(3, company.getId());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RepositoryException(e);
+            throw new DaoException("Обновить не удалось проверьте верны ли параметры");
         }
     }
 
@@ -151,7 +157,7 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
             statement.setLong(1, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RepositoryException(e);
+            throw new DaoException("Удалить не удалось проверьте верны ли параметры");
         }
     }
 
@@ -159,6 +165,6 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
         return new CompanyEntity(
                 resultSet.getLong("id"),
                 resultSet.getString("name"),
-                resultSet.getString("address"));
+                resultSet.getString("city"));
     }
 }

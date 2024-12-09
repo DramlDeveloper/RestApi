@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class StaffEntity {
 
-    private int id;
+    private Long id;
     private String firstName;
     private String lastName;
 
@@ -13,16 +13,35 @@ public class StaffEntity {
     private PostEntity post;
     private CompanyEntity company;
 
-    public StaffEntity(int id, String firstName, String lastName) {
+    public StaffEntity(Long id, String firstName, String lastName) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
+    public StaffEntity(Long id, String firstName, String lastName, PostEntity post, CompanyEntity company) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.post = post;
+        this.company = company;
+    }
+
+    public StaffEntity(String firstName, String lastName, PostEntity post, CompanyEntity company) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.post = post;
+        this.company = company;
+    }
+
     public StaffEntity() {
     }
 
-    public int getId() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
         return id;
     }
 
@@ -34,16 +53,12 @@ public class StaffEntity {
         return lastName;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public PostEntity getPost() {
+        return post;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public CompanyEntity getCompany() {
+        return company;
     }
 
     @Override
@@ -59,5 +74,10 @@ public class StaffEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, firstName, lastName, post, company);
+    }
+
+    @Override
+    public String toString() {
+        return id + " " + firstName + " " + lastName + " " + post + " " + company;
     }
 }

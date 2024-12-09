@@ -8,18 +8,32 @@ public class CompanyEntity {
 
     private Long id;
     private String name;
-    private String address;
+    private String city;
 
-    // Many-to-One
-    private StaffEntity staff;
+    // On-to-Many
+    //private List<StaffEntity> staff;
 
     public CompanyEntity() {
     }
 
-    public CompanyEntity(Long id, String name, String address) {
+    public CompanyEntity(Long id) {
+        this.id = id;
+    }
+
+    public CompanyEntity(Long id, String name, String city) {
         this.id = id;
         this.name = name;
-        this.address = address;
+        this.city = city;
+    }
+
+    public CompanyEntity(String name, String city) {
+        this.name = name;
+        this.city = city;
+    }
+
+    public CompanyEntity(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public Long getId() {
@@ -30,8 +44,8 @@ public class CompanyEntity {
         return name;
     }
 
-    public String getAddress() {
-        return address;
+    public String getCity() {
+        return city;
     }
 
     public void setId(Long id) {
@@ -42,24 +56,24 @@ public class CompanyEntity {
         this.name = name;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setCity(String city) {
+        this.city = city;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         CompanyEntity that = (CompanyEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(address, that.address);
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(city, that.city);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, address);
+        return Objects.hash(id, name, city);
     }
 
     @Override
     public String toString() {
-        return "Company{ id = " +id + ", name = " + name + ", address = " + address + " }";
+        return "Company{ id = " +id + ", name = " + name + ", address = " + city + " }";
     }
 }

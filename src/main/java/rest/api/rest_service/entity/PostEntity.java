@@ -1,15 +1,29 @@
 package rest.api.rest_service.entity;
 
-import java.util.List;
 import java.util.Objects;
 
 public class PostEntity {
-
     private  Long id;
     private  String title;
 
     // One-to-Many
-    private List<StaffEntity> staff;
+    //private List<StaffEntity> staff;
+
+    public PostEntity() {
+    }
+
+    public PostEntity(String title) {
+        this.title = title;
+    }
+
+    public PostEntity(Long id) {
+        this.id = id;
+    }
+
+    public PostEntity(Long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
 
     public Long getId() {
         return id;
@@ -23,10 +37,6 @@ public class PostEntity {
         this.id = id;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -37,5 +47,13 @@ public class PostEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, title);
+    }
+
+    @Override
+    public String toString() {
+        return "PostEntity{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                '}';
     }
 }
