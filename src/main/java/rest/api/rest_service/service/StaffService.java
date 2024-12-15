@@ -61,7 +61,6 @@ public class StaffService {
                 postDao.findById(staffDtoIn.getPostId()).orElse(null),
                 companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)
         ));
-
     }
 
     public void deleteById(Long id) {

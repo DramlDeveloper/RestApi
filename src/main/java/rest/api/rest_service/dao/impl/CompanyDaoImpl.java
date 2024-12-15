@@ -79,7 +79,6 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
         try (var statement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             statement.setLong(1, id);
             var result = statement.executeQuery();
-
             if (result.next()) {
                 company = builderCompanyEntity(result);
             }

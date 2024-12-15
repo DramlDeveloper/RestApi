@@ -5,10 +5,7 @@ import rest.api.rest_service.db.ConnectionManager;
 import rest.api.rest_service.entity.StaffEntity;
 import rest.api.rest_service.exception.DaoException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +58,7 @@ public class StaffDaoImpl implements Dao<StaffEntity, Long> {
     @Override
     public StaffEntity save(StaffEntity staffEntity) {
         try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_SQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, staffEntity.getFirstName());
             preparedStatement.setString(2, staffEntity.getLastName());
             preparedStatement.setLong(3, staffEntity.getCompany().getId());

@@ -37,28 +37,44 @@ public class StaffEntity {
     public StaffEntity() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public String getLastName() {
         return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public PostEntity getPost() {
         return post;
     }
 
+    public void setPost(PostEntity post) {
+        this.post = post;
+    }
+
     public CompanyEntity getCompany() {
         return company;
+    }
+
+    public void setCompany(CompanyEntity company) {
+        this.company = company;
     }
 
     @Override

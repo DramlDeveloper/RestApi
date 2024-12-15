@@ -8,6 +8,7 @@ import rest.api.rest_service.exception.DaoException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +58,7 @@ public class PostDaoImpl implements Dao<PostEntity, Long> {
     @Override
     public PostEntity save(PostEntity postEntity) {
         try (Connection connection = ConnectionManager.get();
-             var statement = connection.prepareStatement(SAVE_SQL)) {
+             var statement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, postEntity.getTitle());
             statement.executeUpdate();
             var keys = statement.getGeneratedKeys();

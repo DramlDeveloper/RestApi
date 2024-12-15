@@ -1,28 +1,28 @@
 package rest.api.rest_service;
 
-import rest.api.rest_service.db.ConnectionManager;
+import rest.api.rest_service.dao.impl.CompanyDaoImpl;
+import rest.api.rest_service.dao.impl.PostDaoImpl;
+import rest.api.rest_service.dao.impl.StaffDaoImpl;
+import rest.api.rest_service.entity.CompanyEntity;
+import rest.api.rest_service.entity.PostEntity;
+import rest.api.rest_service.entity.StaffEntity;
+import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.util.ExecuteSQLUtil;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 public class App {
-
-    public static void checkMetaData() {
-        try (Connection connection = ConnectionManager.get()) {
-            var metaData = connection.getMetaData();
-            var catalogs = metaData.getCatalogs().getMetaData();
-            var value = metaData.getClientInfoProperties();
-            while (value.next()) {
-                System.out.println(value.getString(4));
-            }
-            System.out.println(catalogs.getColumnClassName(1));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static void main(String[] args) {
-        ExecuteSQLUtil.executeScriptSQL();
+       // ExecuteSQLUtil.executeScriptSQL();
+/*        PostDaoImpl postDao = PostDaoImpl.getInstance();
+    var res =  postDao.save(new PostEntity("HOr"));
+        System.out.println(res);*/
+/*        CompanyDaoImpl companyDao = CompanyDaoImpl.getInstance();
+        var res = companyDao.save(new CompanyEntity("Dog", "Word"));
+        System.out.println(res);*/
+
+        StaffDaoImpl staffDao = StaffDaoImpl.getInstance();
+        CompanyDaoImpl companyDao = CompanyDaoImpl.getInstance();
+        PostDaoImpl postDao = PostDaoImpl.getInstance();
+
+        staffDao.save(new StaffEntity("Honor", "Kolin", postDao.findById(1L).orElse(null), companyDao.findById(1L).orElse(null)));
     }
 }

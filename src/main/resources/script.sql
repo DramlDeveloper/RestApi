@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS company
 CREATE TABLE IF NOT EXISTS post
 (
     id    bigserial PRIMARY KEY,
-    title varchar(50) NOT NULL
+    title varchar(256) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS staff

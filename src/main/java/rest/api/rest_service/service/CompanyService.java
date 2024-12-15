@@ -51,24 +51,28 @@ public class CompanyService {
                 companyDtoIn.getCity()));
     }
 
-    public void deleteById(Long id) {
-        companyDao.deleteById(id);
+    public boolean deleteById(Long id)  {
+        return companyDao.deleteById(id);
     }
 
     public void deleteAll() {
-        for (CompanyEntity companyEntity : companyDao.findAll()) {
+        if (!companyDao.findAll().isEmpty()) {
+            for (CompanyEntity companyEntity : companyDao.findAll()) {
                 companyDao.deleteById(companyEntity.getId());
-
+            }
         }
     }
 
-    public void update(CompanyDtoIn companyDtoIn) {
-        companyDao.update(new CompanyEntity(
-                companyDtoIn.getId(),
-                companyDtoIn.getName(),
-                companyDtoIn.getCity()
-        ));
+    public boolean update(CompanyDtoIn companyDtoIn) {
+        if (companyDtoIn != null) {
+            companyDao.update(new CompanyEntity(
+                    companyDtoIn.getId(),
+                    companyDtoIn.getName(),
+                    companyDtoIn.getCity()
+            ));
+            return true;
+        } else {
+            return false;
+        }
     }
-
-
 }
