@@ -54,17 +54,27 @@ public class StaffService {
         return staffDtoOut;
     }
 
-    public void save(StaffDtoIn staffDtoIn) {
+    public StaffDtoOut save(StaffDtoIn staffDtoIn) {
                 staffDao.save(new StaffEntity(
                 staffDtoIn.getFirstName(),
                 staffDtoIn.getLastName(),
                 postDao.findById(staffDtoIn.getPostId()).orElse(null),
                 companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)
         ));
+                return new StaffDtoOut(
+                        staffDtoIn.getId(),
+                        staffDtoIn.getFirstName(),
+                        staffDtoIn.getLastName(),
+                        companyDao.findById(staffDtoIn.getCompanyId()).get().getName(),
+                        postDao.findById(staffDtoIn.getPostId()).get().getTitle());
     }
 
-    public void deleteById(Long id) {
-        staffDao.deleteById(id);
+    public boolean deleteById(Long id) {
+        if(staffDao.findById(id).isPresent()) {
+            staffDao.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     public void deleteAll() {
@@ -73,13 +83,16 @@ public class StaffService {
         }
     }
 
-    public void update(StaffDtoIn staffDtoIn) {
-        staffDao.update(new StaffEntity(
-                staffDtoIn.getId(),
-                staffDtoIn.getFirstName(),
-                staffDtoIn.getLastName(),
-                postDao.findById(staffDtoIn.getPostId()).orElse(null),
-                companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)
-        ));
+    public boolean update(StaffDtoIn staffDtoIn) {
+        if (staffDao.findById(staffDtoIn.getId()).isPresent()) {
+            staffDao.update(new StaffEntity(
+                    staffDtoIn.getId(),
+                    staffDtoIn.getFirstName(),
+                    staffDtoIn.getLastName(),
+                    postDao.findById(staffDtoIn.getPostId()).orElse(null),
+                    companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)));
+        return true;
+        }
+        return false;
     }
 }
