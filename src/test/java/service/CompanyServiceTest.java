@@ -50,7 +50,7 @@ class CompanyServiceTest {
         Mockito.when(companyDao.update(Mockito.any(CompanyEntity.class))).thenReturn(true);
 
         Assertions.assertTrue(companyService.update(dto));
-        Assertions.assertEquals("name: Yandex city: Russian", companyService.findById(5L).getDescription());
+        Assertions.assertEquals("name: Yandex city: Russia", companyService.findById(6L).getDescription());
     }
 
     @Test

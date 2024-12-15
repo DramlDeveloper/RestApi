@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -80,7 +81,7 @@ public class PostDaoImpl implements Dao<PostEntity, Long> {
         }
     }
 
-    public Optional<PostEntity> findById(Long id, Connection connection) {
+    public Optional<PostEntity> findById(Long id, Connection connection) throws  DaoException {
         PostEntity postEntity = null;
         try (var statement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             statement.setLong(1, id);
@@ -89,7 +90,7 @@ public class PostDaoImpl implements Dao<PostEntity, Long> {
                 postEntity = builderPostEntity(resultSet);
             }
             return Optional.ofNullable(postEntity);
-        } catch (SQLException e) {
+        } catch (SQLException | NoSuchElementException e) {
             throw new DaoException("Найти не удалось проверьте верны ли параметры");
         }
     }
