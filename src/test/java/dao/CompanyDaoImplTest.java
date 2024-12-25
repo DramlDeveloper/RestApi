@@ -1,11 +1,14 @@
 package dao;
 
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import rest.api.rest_service.dao.ICompanyDao;
 import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.entity.CompanyEntity;
 import rest.api.rest_service.util.PropertiesUtil;
@@ -15,12 +18,20 @@ import java.util.Optional;
 @Testcontainers
 @Tag("DockerRequired")
 class CompanyDaoImplTest {
-    public static CompanyDaoImpl companyDao;
+    private static final String INIT_SQL = "script.sql";
+    private static int containerPort = 5432;
+    private static int localPort = 5432;
+    public static ICompanyDao companyDao;
     @Container
     public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:14.1-alpine")
             .withDatabaseName("postgres")
             .withUsername(PropertiesUtil.getProperty("db.username"))
-            .withPassword(PropertiesUtil.getProperty("db.password"));
+            .withPassword(PropertiesUtil.getProperty("db.password"))
+            .withExposedPorts(containerPort)
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+                    new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(localPort), new ExposedPort(containerPort)))
+            ))
+            .withInitScript(INIT_SQL);
 
     @BeforeAll
     static void beforeAll() {
@@ -48,34 +59,32 @@ class CompanyDaoImplTest {
         Assertions.assertEquals(expectedName, result.get().getName());
     }
 
-    @DisplayName("findBy_ID")
-    @ParameterizedTest
-    @CsvSource(value = {
-            "1, true",
-            "30, false"
-    })
-    void findById(Long expectedId, Boolean expectedValue) {
-        Optional<CompanyEntity> company = companyDao.findById(expectedId);
 
-        Assertions.assertEquals(expectedValue, company.isPresent());
-        if (company.isPresent()) {
-            Assertions.assertEquals(expectedId, company.get().getId());
-        }
+    @Test
+    void findById() {
+        checkSave();
+        Optional<CompanyEntity> company = companyDao.findById(1L);
+
+        Assertions.assertTrue(company.isPresent());
+        Assertions.assertEquals("Lada", company.get().getName());
+        Assertions.assertEquals(1L, company.get().getId());
     }
 
     @Test
     void checkUpdate() {
+        checkSave();
+
         String expectedName = "Toyota";
         String expectedCity = "Tokio";
 
-        CompanyEntity companyEntity = companyDao.findById(11L).get();
+        CompanyEntity companyEntity = companyDao.findById(1L).get();
         String oldName = companyEntity.getName();
         String oldCity = companyEntity.getCity();
         companyEntity.setName(expectedName);
         companyEntity.setCity(expectedCity);
         companyDao.update(companyEntity);
 
-        CompanyEntity result = companyDao.findById(11L).get();
+        CompanyEntity result = companyDao.findById(1L).get();
 
         Assertions.assertNotEquals(expectedName, oldName);
         Assertions.assertNotEquals(expectedCity, oldCity);
@@ -104,9 +113,8 @@ class CompanyDaoImplTest {
 
     @Test
     void findAll() {
-        int expectedSize = 1;
         int resultSize = companyDao.findAll().size();
 
-        Assertions.assertEquals(expectedSize, resultSize);
+        Assertions.assertEquals(0, resultSize);
     }
 }

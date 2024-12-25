@@ -1,6 +1,7 @@
 package rest.api.rest_service.dao.impl;
 
-import rest.api.rest_service.dao.Dao;
+import rest.api.rest_service.dao.ICompanyDao;
+import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.db.ConnectionManager;
 import rest.api.rest_service.entity.PostEntity;
 import rest.api.rest_service.exception.DaoException;
@@ -15,11 +16,14 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
-public class PostDaoImpl implements Dao<PostEntity, Long> {
+public class PostDaoImpl implements IPostDao {
 
-    private final static PostDaoImpl INSTANCE = new PostDaoImpl();
+    private static IPostDao INSTANCE;
 
-    public static PostDaoImpl getInstance() {
+    public static IPostDao getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new PostDaoImpl();
+        }
         return INSTANCE;
     }
 

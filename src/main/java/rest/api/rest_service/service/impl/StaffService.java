@@ -1,21 +1,25 @@
-package rest.api.rest_service.service;
+package rest.api.rest_service.service.impl;
 
+import rest.api.rest_service.dao.ICompanyDao;
+import rest.api.rest_service.dao.IPostDao;
+import rest.api.rest_service.dao.IStaffDao;
 import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.dao.impl.PostDaoImpl;
 import rest.api.rest_service.dao.impl.StaffDaoImpl;
 import rest.api.rest_service.entity.StaffEntity;
 import rest.api.rest_service.exception.DaoException;
+import rest.api.rest_service.service.IStaffService;
 import rest.api.rest_service.service.dto.StaffDtoIn;
 import rest.api.rest_service.service.dto.StaffDtoOut;
 
 import java.util.List;
 
-public class StaffService {
+public class StaffService implements IStaffService{
 
-    private final static StaffService INSTANCE = new StaffService();
-    private final StaffDaoImpl staffDao = StaffDaoImpl.getInstance();
-    private final CompanyDaoImpl companyDao = CompanyDaoImpl.getInstance();
-    private final PostDaoImpl postDao = PostDaoImpl.getInstance();
+    private static StaffService INSTANCE = new StaffService();
+    private final IStaffDao staffDao = StaffDaoImpl.getInstance();
+    private final ICompanyDao companyDao = CompanyDaoImpl.getInstance();
+    private final IPostDao postDao = PostDaoImpl.getInstance();
 
     public static StaffService getInstance() {
         return INSTANCE;
@@ -70,11 +74,7 @@ public class StaffService {
     }
 
     public boolean deleteById(Long id) {
-        if(staffDao.findById(id).isPresent()) {
-            staffDao.deleteById(id);
-            return true;
-        }
-        return false;
+        return staffDao.deleteById(id);
     }
 
     public void deleteAll() {

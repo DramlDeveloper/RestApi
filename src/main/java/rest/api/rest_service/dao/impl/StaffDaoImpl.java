@@ -1,6 +1,8 @@
 package rest.api.rest_service.dao.impl;
 
-import rest.api.rest_service.dao.Dao;
+import rest.api.rest_service.dao.ICompanyDao;
+import rest.api.rest_service.dao.IPostDao;
+import rest.api.rest_service.dao.IStaffDao;
 import rest.api.rest_service.db.ConnectionManager;
 import rest.api.rest_service.entity.StaffEntity;
 import rest.api.rest_service.exception.DaoException;
@@ -11,16 +13,19 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class StaffDaoImpl implements Dao<StaffEntity, Long> {
+public class StaffDaoImpl implements IStaffDao {
 
-    private final static StaffDaoImpl INSTANCE = new StaffDaoImpl();
+    private static IStaffDao INSTANCE;
 
-    public static StaffDaoImpl getInstance() {
+    public static IStaffDao getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new StaffDaoImpl();
+        }
         return INSTANCE;
     }
 
-    CompanyDaoImpl companyDao = CompanyDaoImpl.getInstance();
-    PostDaoImpl postDao = PostDaoImpl.getInstance();
+    ICompanyDao companyDao = CompanyDaoImpl.getInstance();
+    IPostDao postDao = PostDaoImpl.getInstance();
 
     private StaffDaoImpl() {
     }
@@ -141,9 +146,8 @@ public class StaffDaoImpl implements Dao<StaffEntity, Long> {
                 resultSet.getLong("id"),
                 resultSet.getString("first_name"),
                 resultSet.getString("last_name"),
-                postDao.findById(resultSet.getLong("post_id"),
-                        resultSet.getStatement().getConnection()).orElse(null),
-                companyDao.findById(resultSet.getLong("company_id"),
-                        resultSet.getStatement().getConnection()).orElse(null));
+                postDao.findById(resultSet.getLong("post_id")).orElse(null),
+                companyDao.findById(resultSet.getLong("company_id"))
+                       .orElse(null));
     }
 }

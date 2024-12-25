@@ -1,17 +1,20 @@
-package rest.api.rest_service.service;
+package rest.api.rest_service.service.impl;
 
+import rest.api.rest_service.dao.ICompanyDao;
+import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.dao.impl.PostDaoImpl;
 import rest.api.rest_service.entity.PostEntity;
 import rest.api.rest_service.exception.DaoException;
+import rest.api.rest_service.service.IPostService;
 import rest.api.rest_service.service.dto.PostDtoIn;
 import rest.api.rest_service.service.dto.PostDtoOut;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class PostService {
-    private final static PostService INSTANCE = new PostService();
-    private final PostDaoImpl postDao = PostDaoImpl.getInstance();
+public class PostService implements IPostService {
+    private static PostService INSTANCE = new PostService();
+    private final IPostDao postDao = PostDaoImpl.getInstance();
 
     public static PostService getInstance() {
         return INSTANCE;
@@ -51,11 +54,7 @@ public class PostService {
     }
 
     public boolean deleteById(Long id) {
-        if(postDao.findById(id).isPresent()) {
-            postDao.deleteById(id);
-            return true;
-        }
-        return false;
+        return postDao.deleteById(id);
     }
 
     public void deleteAll() {

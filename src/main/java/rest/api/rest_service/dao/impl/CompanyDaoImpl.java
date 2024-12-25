@@ -1,6 +1,6 @@
 package rest.api.rest_service.dao.impl;
 
-import rest.api.rest_service.dao.Dao;
+import rest.api.rest_service.dao.ICompanyDao;
 import rest.api.rest_service.db.ConnectionManager;
 import rest.api.rest_service.entity.CompanyEntity;
 import rest.api.rest_service.exception.DaoException;
@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
+public class CompanyDaoImpl implements ICompanyDao {
 
-    private static final CompanyDaoImpl INSTANCE = new CompanyDaoImpl();
+    private static ICompanyDao INSTANCE;
 
-    public static CompanyDaoImpl getInstance() {
+    public static synchronized ICompanyDao getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new CompanyDaoImpl();
+        }
         return INSTANCE;
     }
 
@@ -88,37 +91,6 @@ public class CompanyDaoImpl implements Dao<CompanyEntity, Long> {
         }
     }
 
-
-/*    public List<CompanyEntity> filter(CompanyEntity companyEntity, Connection connection) {
-        List<Object> parameters = new ArrayList<>();
-        List<String> whereSql = new ArrayList<>();
-        if(companyEntity.getName() != null){
-            parameters.add(companyEntity.getName());
-            whereSql.add("name = ?");
-        }
-        if (companyEntity.getAddress() != null) {
-            parameters.add(companyEntity.getAddress());
-            whereSql.add("address = ?");
-        }
-        String wSql = whereSql.stream().collect(Collectors.joining(
-                " AND ",
-                " WHERE ",
-                " limit ? offset ?"
-        ));
-        String sql = FIND_ALL_SQL + wSql;
-        try (var connectionM = connection;
-             var statement = connection.prepareStatement(sql)) {
-            List<CompanyEntity> companyEntityList = new ArrayList<>();
-            var result = statement.executeQuery();
-            while (result.next()) {
-                companyEntityList.add(builderCompanyEntity(result)
-                );
-            }
-            return companyEntityList;
-        } catch (SQLException e) {
-            throw new RepositoryException(e);
-        }
-    }*/
 
     @Override
     public List<CompanyEntity> findAll() {

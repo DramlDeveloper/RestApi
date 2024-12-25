@@ -1,11 +1,16 @@
 package dao;
 
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import rest.api.rest_service.dao.ICompanyDao;
+import rest.api.rest_service.dao.IPostDao;
+import rest.api.rest_service.dao.IStaffDao;
 import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.dao.impl.PostDaoImpl;
 import rest.api.rest_service.dao.impl.StaffDaoImpl;
@@ -19,14 +24,22 @@ import java.util.Optional;
 @Testcontainers
 @Tag("DockerRequired")
 class StaffDaoImplTest {
-    public static StaffDaoImpl staffDao;
-    public static CompanyDaoImpl companyDao;
-    public static PostDaoImpl postDao;
+    private static final String INIT_SQL = "script.sql";
+    private static int containerPort = 5432;
+    private static int localPort = 5432;
+    public static IStaffDao staffDao;
+    public static ICompanyDao companyDao;
+    public static IPostDao postDao;
     @Container
     public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:14.1-alpine")
             .withDatabaseName("postgres")
             .withUsername(PropertiesUtil.getProperty("db.username"))
-            .withPassword(PropertiesUtil.getProperty("db.password"));
+            .withPassword(PropertiesUtil.getProperty("db.password"))
+            .withExposedPorts(containerPort)
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+                    new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(localPort), new ExposedPort(containerPort)))
+            ))
+            .withInitScript(INIT_SQL);
 
     @BeforeAll
     static void beforeAll() {
@@ -45,8 +58,8 @@ class StaffDaoImplTest {
     void checkSave() {
         String expectedFirstName = "Fredi";
         String expectedLastName = "Colin";
-        PostEntity post = postDao.findById(1L).orElse(null);
-        CompanyEntity company = companyDao.findById(1L).orElse(null);
+        PostEntity post = postDao.save(new PostEntity("Архитектор"));
+        CompanyEntity company = companyDao.save(new CompanyEntity("Lada", "Tolyatti"));
         StaffEntity staffEntity = new StaffEntity(
                 expectedFirstName,
                 expectedLastName,
@@ -63,78 +76,67 @@ class StaffDaoImplTest {
         Assertions.assertEquals(company, result.get().getCompany());
     }
 
-    @DisplayName("findBy_ID")
-    @ParameterizedTest
-    @CsvSource(value = {
-            "1, true",
-            "30, false"
-    })
-    void findById(Long expectedId, Boolean expectedValue) {
-        Optional<StaffEntity> staffEntity = staffDao.findById(expectedId);
+    @Test
+    void findById() {
+        checkSave();
+        Optional<StaffEntity> staffEntity = staffDao.findById(1L);
 
-        Assertions.assertEquals(expectedValue, staffEntity.isPresent());
-        if (staffEntity.isPresent()) {
-            Assertions.assertEquals(expectedId, staffEntity.get().getId());
-        }
+        Assertions.assertTrue(staffEntity.isPresent());
+        Assertions.assertEquals(1L, staffEntity.get().getId());
+        Assertions.assertEquals("Fredi", staffEntity.get().getFirstName());
+        Assertions.assertEquals("Colin", staffEntity.get().getLastName());
+        Assertions.assertEquals("Lada", staffEntity.get().getCompany().getName());
+        Assertions.assertEquals("Tolyatti", staffEntity.get().getCompany().getCity());
+        Assertions.assertEquals("Архитектор", staffEntity.get().getPost().getTitle());
     }
 
     @Test
     void checkUpdate() {
+        checkSave();
+
+        String oldFirstName = staffDao.findById(1L).get().getFirstName(); // "Fredi"
+        String oldLastName = staffDao.findById(1L).get().getLastName(); // "Colin"
+        Long oldPostId = staffDao.findById(1L).get().getPost().getId(); // 1L
+        Long oldCompanyId = staffDao.findById(1L).get().getCompany().getId(); // 1L
+
         String expectedFirstName = "Viktor";
         String expectedLastName = "Svarowski";
-        PostEntity post = postDao.findById(1L).orElse(null);
-        CompanyEntity company = companyDao.findById(1L).orElse(null);
 
-        StaffEntity staffEntity = staffDao.findById(1L).get();
-        String oldFirstName = staffEntity.getFirstName();
-        String oldLastName = staffEntity.getFirstName();
-        PostEntity oldPost = staffEntity.getPost();
-        CompanyEntity oldCompany = staffEntity.getCompany();
+        StaffEntity staffEntity = new StaffEntity(
+                1L,
+                expectedFirstName,
+                expectedLastName,
+                postDao.findById(1L).get(),
+                companyDao.findById(1L).get()
+        );
 
-        staffEntity.setFirstName(expectedFirstName);
-        staffEntity.setLastName(expectedLastName);
-        staffDao.update(staffEntity);
+        Assertions.assertEquals(oldFirstName, staffDao.findById(1L).get().getFirstName());
+        Assertions.assertEquals(oldLastName, staffDao.findById(1L).get().getLastName());
 
-        StaffEntity result = staffDao.findById(1L).get();
+        boolean resultUpdate = staffDao.update(staffEntity);
 
-        Assertions.assertNotEquals(expectedFirstName, oldFirstName);
-        Assertions.assertNotEquals(expectedLastName, oldLastName);
-        Assertions.assertEquals(post, oldPost);
-        Assertions.assertEquals(company, oldCompany);
-        Assertions.assertEquals(post, result.getPost());
-        Assertions.assertEquals(company, result.getCompany());
-        Assertions.assertEquals(expectedFirstName, result.getFirstName());
-        Assertions.assertEquals(expectedLastName, result.getLastName());
+        Assertions.assertTrue(resultUpdate);
+        Assertions.assertEquals(1L, staffDao.findById(1L).get().getId());
+        Assertions.assertEquals(expectedFirstName, staffDao.findById(1L).get().getFirstName());
+        Assertions.assertEquals(expectedLastName, staffDao.findById(1L).get().getLastName());
+        Assertions.assertEquals(oldPostId, staffDao.findById(1L).get().getPost().getId());
+        Assertions.assertEquals(oldCompanyId, staffDao.findById(1L).get().getCompany().getId());
+
     }
 
     @Test
     void deleteById() {
-        Boolean expectedValue = true;
-        int expectedSize = companyDao.findAll().size();
+        checkSave();
+        boolean resultDelete = staffDao.deleteById(1L);
 
-        StaffEntity tempStaff = new StaffEntity(
-                "Jon",
-                "Bond",
-                postDao.findById(1L).orElse(null),
-                companyDao.findById(1L).orElse(null));
-        tempStaff = staffDao.save(tempStaff);
-
-        int resultSizeBefore = staffDao.findAll().size();
-        Assertions.assertNotEquals(expectedSize, resultSizeBefore);
-
-        boolean resultDelete = staffDao.deleteById(tempStaff.getId());
-        int resultSizeAfter = staffDao.findAll().size();
-
-        Assertions.assertEquals(expectedValue, resultDelete);
-        Assertions.assertEquals(expectedSize, resultSizeAfter);
-
+        Assertions.assertTrue(resultDelete);
     }
 
     @Test
     void findAll() {
-        int expectedSize = 1;
-        int resultSize = staffDao.findAll().size();
+        Assertions.assertEquals(0, staffDao.findAll().size());
 
-        Assertions.assertEquals(expectedSize, resultSize);
+        checkSave();
+        Assertions.assertEquals(1, staffDao.findAll().size());
     }
 }

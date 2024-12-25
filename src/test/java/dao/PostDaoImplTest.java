@@ -1,11 +1,14 @@
 package dao;
 
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.dao.impl.PostDaoImpl;
 import rest.api.rest_service.entity.PostEntity;
 import rest.api.rest_service.util.PropertiesUtil;
@@ -15,12 +18,20 @@ import java.util.Optional;
 @Testcontainers
 @Tag("DockerRequired")
 class PostDaoImplTest {
-    public static PostDaoImpl postDao;
+    private static final String INIT_SQL = "script.sql";
+    private static int containerPort = 5432;
+    private static int localPort = 5432;
+    public static IPostDao postDao;
     @Container
     public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:14.1-alpine")
             .withDatabaseName("postgres")
             .withUsername(PropertiesUtil.getProperty("db.username"))
-            .withPassword(PropertiesUtil.getProperty("db.password"));
+            .withPassword(PropertiesUtil.getProperty("db.password"))
+            .withExposedPorts(containerPort)
+            .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
+                    new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(localPort), new ExposedPort(containerPort)))
+            ))
+            .withInitScript(INIT_SQL);
 
     @BeforeAll
     static void beforeAll() {
@@ -47,17 +58,15 @@ class PostDaoImplTest {
         Assertions.assertEquals(expectedTitle, result.get().getTitle());
     }
 
-    @DisplayName("findBy_ID")
-    @ParameterizedTest
-    @CsvSource(value = {
-            "1, true",
-            "30, false"
-    })
-    void findById(Long expectedId, Boolean expectedValue) {
-        Optional<PostEntity> post = postDao.findById(expectedId);
 
-        Assertions.assertEquals(expectedValue, post.isPresent());
-        post.ifPresent(postEntity -> Assertions.assertEquals(expectedId, postEntity.getId()));
+    @Test
+    void findById() {
+        checkSave();
+        Optional<PostEntity> post = postDao.findById(1L);
+
+        Assertions.assertTrue(post.isPresent());
+        Assertions.assertEquals("Архитектор", post.get().getTitle());
+        Assertions.assertEquals(1L, post.get().getId());
     }
 
     @Test
@@ -74,6 +83,7 @@ class PostDaoImplTest {
         Assertions.assertNotEquals(expectedTitle, oldTitle);
         Assertions.assertEquals(expectedTitle, result.getTitle());
     }
+
     @Test
     void deleteById() {
         Boolean expectedValue = true;
@@ -94,9 +104,8 @@ class PostDaoImplTest {
 
     @Test
     void findAll() {
-        int expectedSize = 1;
         int resultSize = postDao.findAll().size();
 
-        Assertions.assertEquals(expectedSize, resultSize);
+        Assertions.assertEquals(0, resultSize);
     }
 }

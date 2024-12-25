@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
-import rest.api.rest_service.service.StaffService;
+import rest.api.rest_service.service.impl.StaffService;
 import rest.api.rest_service.service.dto.StaffDtoIn;
 
 import java.io.IOException;

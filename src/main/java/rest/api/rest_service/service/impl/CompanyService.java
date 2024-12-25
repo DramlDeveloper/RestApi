@@ -1,16 +1,18 @@
-package rest.api.rest_service.service;
+package rest.api.rest_service.service.impl;
 
+import rest.api.rest_service.dao.ICompanyDao;
 import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.entity.CompanyEntity;
+import rest.api.rest_service.service.ICompanyService;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.service.dto.CompanyDtoOut;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CompanyService {
-    private final static CompanyService INSTANCE = new CompanyService();
-    private final CompanyDaoImpl companyDao = CompanyDaoImpl.getInstance();
+public class CompanyService implements ICompanyService {
+    private static CompanyService INSTANCE = new CompanyService();
+    private final ICompanyDao companyDao = CompanyDaoImpl.getInstance();
 
     public static CompanyService getInstance() {
         return INSTANCE;
