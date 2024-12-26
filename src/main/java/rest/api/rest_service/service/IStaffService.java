@@ -10,7 +10,7 @@ public interface IStaffService {
 
     StaffDtoOut findById(Long id);
 
-    StaffDtoOut save(StaffDtoIn staffDtoIn);
+    boolean save(StaffDtoIn staffDtoIn);
 
     boolean deleteById(Long id);
 

@@ -29,19 +29,24 @@ public class StaffService implements IStaffService{
     }
 
     public List<StaffDtoOut> findAll() {
-        return staffDao.findAll().stream()
-                .map(
-                        entity -> new StaffDtoOut(
-                                entity.getId(),
-                                entity.getFirstName(),
-                                entity.getLastName(),
-                                entity.getCompany().getName(),
-                                entity.getPost().getTitle())
-                ).toList();
+        try {
+            return staffDao.findAll().stream()
+                    .map(
+                            entity -> new StaffDtoOut(
+                                    entity.getId(),
+                                    entity.getFirstName(),
+                                    entity.getLastName(),
+                                    entity.getCompany().getName(),
+                                    entity.getPost().getTitle())
+                    ).toList();
+        }catch (Exception e) {
+            throw new DaoException("Data not found");
+        }
+
     }
 
     public StaffDtoOut findById(Long id) {
-        StaffDtoOut staffDtoOut = null;
+        StaffDtoOut staffDtoOut;
         try {
              staffDtoOut = staffDao.findById(id).stream()
                     .map(entity -> new StaffDtoOut(
@@ -51,26 +56,31 @@ public class StaffService implements IStaffService{
                             entity.getCompany().getName(),
                             entity.getPost().getTitle()))
                     .findAny()
-                    .orElseThrow();
+                    .orElse(null);
         } catch (Exception e) {
             throw new DaoException("the ID does not exist");
         }
         return staffDtoOut;
     }
 
-    public StaffDtoOut save(StaffDtoIn staffDtoIn) {
-                staffDao.save(new StaffEntity(
-                staffDtoIn.getFirstName(),
-                staffDtoIn.getLastName(),
-                postDao.findById(staffDtoIn.getPostId()).orElse(null),
-                companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)
-        ));
-                return new StaffDtoOut(
+    public boolean save(StaffDtoIn staffDtoIn) {
+        if (staffDtoIn != null) {
+            staffDao.save(new StaffEntity(
+                    staffDtoIn.getFirstName(),
+                    staffDtoIn.getLastName(),
+                    postDao.findById(staffDtoIn.getPostId()).orElse(null),
+                    companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)
+            ));
+            return true;
+        }
+
+                return false;
+                /*return new StaffDtoOut(
                         staffDtoIn.getId(),
                         staffDtoIn.getFirstName(),
                         staffDtoIn.getLastName(),
                         companyDao.findById(staffDtoIn.getCompanyId()).get().getName(),
-                        postDao.findById(staffDtoIn.getPostId()).get().getTitle());
+                        postDao.findById(staffDtoIn.getPostId()).get().getTitle());*/
     }
 
     public boolean deleteById(Long id) {
@@ -84,15 +94,12 @@ public class StaffService implements IStaffService{
     }
 
     public boolean update(StaffDtoIn staffDtoIn) {
-        if (staffDao.findById(staffDtoIn.getId()).isPresent()) {
-            staffDao.update(new StaffEntity(
+           return staffDao.update(new StaffEntity(
                     staffDtoIn.getId(),
                     staffDtoIn.getFirstName(),
                     staffDtoIn.getLastName(),
                     postDao.findById(staffDtoIn.getPostId()).orElse(null),
                     companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)));
-        return true;
-        }
-        return false;
+
     }
 }

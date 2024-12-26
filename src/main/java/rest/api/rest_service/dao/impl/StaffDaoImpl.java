@@ -81,9 +81,11 @@ public class StaffDaoImpl implements IStaffDao {
 
     @Override
     public Optional<StaffEntity> findById(Long id) {
+        StaffEntity staffEntity = null;
+
         try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
-            StaffEntity staffEntity = null;
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.executeQuery();

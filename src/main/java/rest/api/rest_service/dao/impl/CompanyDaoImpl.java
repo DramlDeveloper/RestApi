@@ -17,7 +17,7 @@ public class CompanyDaoImpl implements ICompanyDao {
 
     private static ICompanyDao INSTANCE;
 
-    public static synchronized ICompanyDao getInstance() {
+    public static ICompanyDao getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new CompanyDaoImpl();
         }
