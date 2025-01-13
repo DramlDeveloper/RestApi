@@ -4,8 +4,8 @@ public class PostDtoIn {
     private Long id;
     private String title;
 
-    public PostDtoIn() {
-    }
+    public PostDtoIn() {}
+
     public PostDtoIn(Long id, String title) {
         this.id = id;
         this.title = title;

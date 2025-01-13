@@ -10,14 +10,7 @@ public class CompanyEntity {
     private String name;
     private String city;
 
-    // On-to-Many
-    //private List<StaffEntity> staff;
-
     public CompanyEntity() {
-    }
-
-    public CompanyEntity(Long id) {
-        this.id = id;
     }
 
     public CompanyEntity(Long id, String name, String city) {
@@ -29,11 +22,6 @@ public class CompanyEntity {
     public CompanyEntity(String name, String city) {
         this.name = name;
         this.city = city;
-    }
-
-    public CompanyEntity(Long id, String name) {
-        this.id = id;
-        this.name = name;
     }
 
     public Long getId() {

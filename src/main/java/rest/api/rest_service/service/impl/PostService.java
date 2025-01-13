@@ -1,6 +1,5 @@
 package rest.api.rest_service.service.impl;
 
-import rest.api.rest_service.dao.ICompanyDao;
 import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.dao.impl.PostDaoImpl;
 import rest.api.rest_service.entity.PostEntity;
@@ -63,17 +62,17 @@ public class PostService implements IPostService {
         }
     }
 
-    public boolean update(PostDtoIn postDtoIn) {
+    public PostDtoOut update(PostDtoIn postDtoIn) {
         if (postDtoIn != null) {
             postDao.update(new PostEntity(
                     postDtoIn.getId(),
                     postDtoIn.getTitle()
             ));
-            return true;
+            return new PostDtoOut(
+                    postDtoIn.getId(),
+                    postDtoIn.getTitle()
+            );
         }
-
-        return false;
+        return new PostDtoOut(0L, "not found");
     }
-
-
 }

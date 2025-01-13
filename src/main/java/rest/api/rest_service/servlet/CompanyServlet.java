@@ -1,16 +1,17 @@
 package rest.api.rest_service.servlet;
 
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
-import rest.api.rest_service.service.impl.CompanyService;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
+import rest.api.rest_service.service.impl.CompanyService;
 
 import java.io.IOException;
+
+import static rest.api.rest_service.util.JsonHeaderUtil.jsonHeader;
 
 
 @WebServlet("/company")
@@ -18,19 +19,10 @@ public class CompanyServlet extends HttpServlet {
     private final CompanyService service = CompanyService.getInstance();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        System.out.println("Servlet init");
-    }
-
     public void writeJson(Object value, HttpServletResponse resp) throws IOException {
         resp.getWriter().write(mapper.writeValueAsString(value));
     }
 
-    private static void jsonHeader(HttpServletResponse resp) {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

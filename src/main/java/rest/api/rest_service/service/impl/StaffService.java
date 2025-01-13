@@ -14,7 +14,7 @@ import rest.api.rest_service.service.dto.StaffDtoOut;
 
 import java.util.List;
 
-public class StaffService implements IStaffService{
+public class StaffService implements IStaffService {
 
     private static StaffService INSTANCE = new StaffService();
     private final IStaffDao staffDao = StaffDaoImpl.getInstance();
@@ -39,7 +39,7 @@ public class StaffService implements IStaffService{
                                     entity.getCompany().getName(),
                                     entity.getPost().getTitle())
                     ).toList();
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new DaoException("Data not found");
         }
 
@@ -48,7 +48,7 @@ public class StaffService implements IStaffService{
     public StaffDtoOut findById(Long id) {
         StaffDtoOut staffDtoOut;
         try {
-             staffDtoOut = staffDao.findById(id).stream()
+            staffDtoOut = staffDao.findById(id).stream()
                     .map(entity -> new StaffDtoOut(
                             entity.getId(),
                             entity.getFirstName(),
@@ -73,14 +73,7 @@ public class StaffService implements IStaffService{
             ));
             return true;
         }
-
-                return false;
-                /*return new StaffDtoOut(
-                        staffDtoIn.getId(),
-                        staffDtoIn.getFirstName(),
-                        staffDtoIn.getLastName(),
-                        companyDao.findById(staffDtoIn.getCompanyId()).get().getName(),
-                        postDao.findById(staffDtoIn.getPostId()).get().getTitle());*/
+        return false;
     }
 
     public boolean deleteById(Long id) {
@@ -93,13 +86,21 @@ public class StaffService implements IStaffService{
         }
     }
 
-    public boolean update(StaffDtoIn staffDtoIn) {
-           return staffDao.update(new StaffEntity(
+    public StaffDtoOut update(StaffDtoIn staffDtoIn) {
+
+        if (staffDtoIn != null
+                && postDao.findById(staffDtoIn.getPostId()).isPresent()
+                && companyDao.findById(staffDtoIn.getCompanyId()).isPresent()) {
+
+             staffDao.update(new StaffEntity(
                     staffDtoIn.getId(),
                     staffDtoIn.getFirstName(),
                     staffDtoIn.getLastName(),
                     postDao.findById(staffDtoIn.getPostId()).orElse(null),
-                    companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)));
-
+                    companyDao.findById(staffDtoIn.getCompanyId()).orElse(null)
+            ));
+             return findById(staffDtoIn.getId());
+        }
+        return null;
     }
 }

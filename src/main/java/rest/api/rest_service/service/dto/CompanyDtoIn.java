@@ -8,8 +8,7 @@ public class CompanyDtoIn {
     private String name;
     private String city;
 
-    public CompanyDtoIn() {
-    }
+    public CompanyDtoIn() {}
 
     public CompanyDtoIn(String name, String city) {
         this.name = name;

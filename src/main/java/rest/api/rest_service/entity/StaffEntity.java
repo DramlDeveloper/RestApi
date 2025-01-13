@@ -9,15 +9,8 @@ public class StaffEntity {
     private String firstName;
     private String lastName;
 
-    // Many-to-One
     private PostEntity post;
     private CompanyEntity company;
-
-    public StaffEntity(Long id, String firstName, String lastName) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
 
     public StaffEntity(Long id, String firstName, String lastName, PostEntity post, CompanyEntity company) {
         this.id = id;

@@ -14,5 +14,5 @@ public interface IStaffService {
 
     boolean deleteById(Long id);
 
-    boolean update(StaffDtoIn staffDtoIn);
+    StaffDtoOut update(StaffDtoIn staffDtoIn);
 }

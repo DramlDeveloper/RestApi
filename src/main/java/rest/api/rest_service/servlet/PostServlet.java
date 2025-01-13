@@ -1,16 +1,17 @@
 package rest.api.rest_service.servlet;
 
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
-import rest.api.rest_service.service.impl.PostService;
 import rest.api.rest_service.service.dto.PostDtoIn;
+import rest.api.rest_service.service.impl.PostService;
 
 import java.io.IOException;
+
+import static rest.api.rest_service.util.JsonHeaderUtil.jsonHeader;
 
 
 @WebServlet("/post")
@@ -18,20 +19,10 @@ public class PostServlet extends HttpServlet {
     private final PostService service = PostService.getInstance();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        System.out.println("Servlet init");
-    }
-
     public void writeJson(Object value, HttpServletResponse resp) throws IOException {
         resp.getWriter().write(mapper.writeValueAsString(value));
     }
 
-    private static void jsonHeader(HttpServletResponse resp) {
-        resp.addHeader("Content-Type", "application/json");
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

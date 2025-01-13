@@ -1,6 +1,5 @@
 package rest.api.rest_service.dao.impl;
 
-import rest.api.rest_service.dao.ICompanyDao;
 import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.db.ConnectionManager;
 import rest.api.rest_service.entity.PostEntity;

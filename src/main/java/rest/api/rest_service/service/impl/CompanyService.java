@@ -53,7 +53,7 @@ public class CompanyService implements ICompanyService {
                 companyDtoIn.getCity()));
     }
 
-    public boolean deleteById(Long id)  {
+    public boolean deleteById(Long id) {
         return companyDao.deleteById(id);
     }
 
@@ -65,16 +65,21 @@ public class CompanyService implements ICompanyService {
         }
     }
 
-    public boolean update(CompanyDtoIn companyDtoIn) {
+    public CompanyDtoOut update(CompanyDtoIn companyDtoIn) {
         if (companyDtoIn != null) {
             companyDao.update(new CompanyEntity(
                     companyDtoIn.getId(),
                     companyDtoIn.getName(),
                     companyDtoIn.getCity()
             ));
-            return true;
-        } else {
-            return false;
+            return new CompanyDtoOut(
+                    companyDtoIn.getId(),
+                    "name: %s city: %s".formatted(
+                            companyDtoIn.getCity(),
+                            companyDtoIn.getName()
+                    )
+            );
         }
+        return new CompanyDtoOut(0L, "not found");
     }
 }

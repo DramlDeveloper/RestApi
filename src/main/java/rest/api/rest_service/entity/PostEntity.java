@@ -6,14 +6,7 @@ public class PostEntity {
     private  Long id;
     private  String title;
 
-    // One-to-Many
-    //private List<StaffEntity> staff;
-
     public PostEntity() {
-    }
-
-    public PostEntity(Long id) {
-        this.id = id;
     }
 
     public PostEntity(String title) {

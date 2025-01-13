@@ -14,5 +14,5 @@ public interface IPostService {
 
     boolean deleteById(Long id);
 
-    boolean update(PostDtoIn postDtoIn);
+    PostDtoOut update(PostDtoIn postDtoIn);
 }
