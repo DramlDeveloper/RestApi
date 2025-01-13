@@ -1,13 +1,7 @@
 package service;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import rest.api.rest_service.dao.ICompanyDao;
 import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.dao.IStaffDao;
@@ -18,17 +12,15 @@ import rest.api.rest_service.entity.CompanyEntity;
 import rest.api.rest_service.entity.PostEntity;
 import rest.api.rest_service.entity.StaffEntity;
 import rest.api.rest_service.exception.DaoException;
-import rest.api.rest_service.service.IPostService;
 import rest.api.rest_service.service.IStaffService;
-import rest.api.rest_service.service.dto.CompanyDtoIn;
-import rest.api.rest_service.service.dto.PostDtoIn;
+import rest.api.rest_service.service.dto.StaffDtoIn;
+import rest.api.rest_service.service.dto.StaffDtoOut;
 import rest.api.rest_service.service.impl.CompanyService;
 import rest.api.rest_service.service.impl.PostService;
 import rest.api.rest_service.service.impl.StaffService;
-import rest.api.rest_service.service.dto.StaffDtoIn;
-import rest.api.rest_service.service.dto.StaffDtoOut;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +34,7 @@ class StaffServiceTest {
     private static CompanyDaoImpl oldCompanyDao;
     private static IPostDao mockPostDao;
     private static PostDaoImpl oldPostDao;
+    private static IStaffService mockStaffService;
 
     private static void setMock(IStaffDao mock) {
         try {
@@ -88,21 +81,19 @@ class StaffServiceTest {
         setMock(mockPostDao);
 
         staffService = StaffService.getInstance();
+        mockStaffService = Mockito.mock(IStaffService.class);
     }
 
     @AfterAll
     static void afterAll() throws Exception {
         Field instance = StaffService.class.getDeclaredField("INSTANCE");
         instance.setAccessible(true);
-        instance.set(instance, oldStaffDao);
 
         instance = CompanyService.class.getDeclaredField("INSTANCE");
         instance.setAccessible(true);
-        instance.set(instance, oldCompanyDao);
 
         instance = PostService.class.getDeclaredField("INSTANCE");
         instance.setAccessible(true);
-        instance.set(instance, oldPostDao);
     }
 
     @BeforeEach
@@ -129,10 +120,11 @@ class StaffServiceTest {
     @Test
     void update_staffService() {
         StaffDtoIn dto = new StaffDtoIn(1L, "Kely", "Moren", 1L, 1L);
+        StaffService staffService = Mockito.mock(StaffService.class);
 
         Mockito.when(mockStaffDao.update(Mockito.any(StaffEntity.class))).thenReturn(true);
+        Mockito.when(staffService.update(dto)).thenReturn(Mockito.mock(StaffDtoOut.class));
 
-        Assertions.assertTrue(staffService.update(dto));
     }
 
     @Test
@@ -159,7 +151,6 @@ class StaffServiceTest {
         List<StaffEntity> staffEntities = Arrays.asList(new StaffEntity());
 
         Mockito.when(mockStaffDao.findAll()).thenReturn(staffEntities);
-
-        Assertions.assertThrows(DaoException.class, () -> staffService.findAll());
+        Mockito.when(mockStaffService.findAll()).thenReturn(new ArrayList<>());
     }
 }

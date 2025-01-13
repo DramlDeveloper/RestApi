@@ -12,7 +12,7 @@ public interface ICompanyService {
 
     CompanyDtoOut findById(Long id);
 
-    CompanyDtoOut update(CompanyDtoIn companyDtoIn);
+    boolean update(CompanyDtoIn companyDtoIn);
 
     boolean deleteById(Long id);
 }

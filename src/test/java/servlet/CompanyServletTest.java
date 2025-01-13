@@ -4,6 +4,7 @@ package servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +30,8 @@ public class CompanyServletTest {
     private HttpServletResponse mockResponse;
     @Mock
     private BufferedReader mockBufferedReader;
+
+
 
     @Test
     public void testDoGet() throws ServletException, IOException {

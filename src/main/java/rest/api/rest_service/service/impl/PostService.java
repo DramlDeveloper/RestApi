@@ -7,13 +7,16 @@ import rest.api.rest_service.exception.DaoException;
 import rest.api.rest_service.service.IPostService;
 import rest.api.rest_service.service.dto.PostDtoIn;
 import rest.api.rest_service.service.dto.PostDtoOut;
+import rest.api.rest_service.service.mapper.IPostDtoMapper;
+import rest.api.rest_service.service.mapper.impl.PostDtoMapperImpl;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 public class PostService implements IPostService {
-    private static PostService INSTANCE = new PostService();
+    private final static PostService INSTANCE = new PostService();
     private final IPostDao postDao = PostDaoImpl.getInstance();
+    private final IPostDtoMapper postDtoMapper = PostDtoMapperImpl.getINSTANCE();
 
     public static PostService getInstance() {
         return INSTANCE;
@@ -25,17 +28,13 @@ public class PostService implements IPostService {
 
     public List<PostDtoOut> findAll() {
         return postDao.findAll().stream()
-                .map(
-                        postEntity -> new PostDtoOut(postEntity.getId(),
-                                postEntity.getTitle())
-                ).toList();
+                .map(postDtoMapper::map).toList();
     }
 
     public PostDtoOut findById(Long id) {
         try {
             return postDao.findById(id).stream()
-                    .map(entry -> new PostDtoOut(entry.getId(),
-                            entry.getTitle()))
+                    .map(postDtoMapper::map)
                     .findAny()
                     .orElseThrow();
         } catch (NoSuchElementException e) {
@@ -45,11 +44,8 @@ public class PostService implements IPostService {
     }
 
     public PostDtoOut save(PostDtoIn postDtoIn) {
-        var id = postDao.save(new PostEntity(
-                postDtoIn.getTitle())
-        ).getId();
-        return new PostDtoOut(
-                id, postDtoIn.getTitle());
+        var id = postDao.save(postDtoMapper.map(postDtoIn)).getId();
+        return findById(id);
     }
 
     public boolean deleteById(Long id) {
@@ -64,14 +60,8 @@ public class PostService implements IPostService {
 
     public PostDtoOut update(PostDtoIn postDtoIn) {
         if (postDtoIn != null) {
-            postDao.update(new PostEntity(
-                    postDtoIn.getId(),
-                    postDtoIn.getTitle()
-            ));
-            return new PostDtoOut(
-                    postDtoIn.getId(),
-                    postDtoIn.getTitle()
-            );
+            postDao.update(postDtoMapper.map(postDtoIn));
+            return postDtoMapper.mapPostDtoIn(postDtoIn);
         }
         return new PostDtoOut(0L, "not found");
     }

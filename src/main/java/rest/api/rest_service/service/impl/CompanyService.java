@@ -6,13 +6,16 @@ import rest.api.rest_service.entity.CompanyEntity;
 import rest.api.rest_service.service.ICompanyService;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.service.dto.CompanyDtoOut;
+import rest.api.rest_service.service.mapper.ICompanyDtoMapper;
+import rest.api.rest_service.service.mapper.impl.ICompanyDtoMapperIml;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CompanyService implements ICompanyService {
-    private static CompanyService INSTANCE = new CompanyService();
+    private final static CompanyService INSTANCE = new CompanyService();
     private final ICompanyDao companyDao = CompanyDaoImpl.getInstance();
+    private final ICompanyDtoMapper ICompanyDtoMapper = ICompanyDtoMapperIml.getInstance();
 
     public static CompanyService getInstance() {
         return INSTANCE;
@@ -24,33 +27,19 @@ public class CompanyService implements ICompanyService {
 
     public List<CompanyDtoOut> findAll() {
         return companyDao.findAll().stream()
-                .map(
-                        companyEntity -> new CompanyDtoOut(companyEntity.getId(),
-                                "name: %s city: %s".formatted(
-                                        companyEntity.getName(),
-                                        companyEntity.getCity())
-                        )
-                ).collect(Collectors.toList());
+                .map(ICompanyDtoMapper::map).collect(Collectors.toList());
     }
 
     public CompanyDtoOut findById(Long id) {
         return companyDao.findById(id).stream()
-                .map(entry -> new CompanyDtoOut(entry.getId(),
-                        "name: %s city: %s".formatted(
-                                entry.getName(),
-                                entry.getCity())))
+                .map(ICompanyDtoMapper::map)
                 .findAny()
                 .orElse(new CompanyDtoOut(0L, "not found"));
     }
 
     public CompanyDtoOut save(CompanyDtoIn companyDtoIn) {
-        var id = companyDao.save(new CompanyEntity(
-                companyDtoIn.getName(),
-                companyDtoIn.getCity())
-        ).getId();
-        return new CompanyDtoOut(
-                id, "name: %s city: %s".formatted(companyDtoIn.getName(),
-                companyDtoIn.getCity()));
+        var id = companyDao.save(ICompanyDtoMapper.map(companyDtoIn)).getId();
+        return findById(id);
     }
 
     public boolean deleteById(Long id) {
@@ -65,21 +54,11 @@ public class CompanyService implements ICompanyService {
         }
     }
 
-    public CompanyDtoOut update(CompanyDtoIn companyDtoIn) {
+    public boolean update(CompanyDtoIn companyDtoIn) {
         if (companyDtoIn != null) {
-            companyDao.update(new CompanyEntity(
-                    companyDtoIn.getId(),
-                    companyDtoIn.getName(),
-                    companyDtoIn.getCity()
-            ));
-            return new CompanyDtoOut(
-                    companyDtoIn.getId(),
-                    "name: %s city: %s".formatted(
-                            companyDtoIn.getCity(),
-                            companyDtoIn.getName()
-                    )
-            );
+            companyDao.update(ICompanyDtoMapper.map(companyDtoIn));
+            return true;
         }
-        return new CompanyDtoOut(0L, "not found");
+        return false;
     }
 }

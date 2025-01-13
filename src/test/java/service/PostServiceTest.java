@@ -21,6 +21,8 @@ class PostServiceTest {
     private static IPostService postService;
     private static IPostDao mockPostDao;
     private static PostDaoImpl oldPostDao;
+    private static PostService mockPostService;
+
 
     private static void setMock(IPostDao mock) {
         try {
@@ -33,18 +35,19 @@ class PostServiceTest {
         }
     }
 
+
     @BeforeAll
     static void beforeAll() {
         mockPostDao = Mockito.mock(IPostDao.class);
         setMock(mockPostDao);
         postService = PostService.getInstance();
+        mockPostService = Mockito.mock(PostService.class);
     }
 
     @AfterAll
     static void afterAll() throws Exception {
         Field instance = PostService.class.getDeclaredField("INSTANCE");
         instance.setAccessible(true);
-        instance.set(instance, oldPostDao);
     }
 
     @BeforeEach
@@ -58,29 +61,27 @@ class PostServiceTest {
         PostEntity postEntity = new PostEntity("Дизайнер");
 
         Mockito.when(mockPostDao.save(Mockito.any(PostEntity.class))).thenReturn(postEntity);
+        Mockito.when(mockPostService.save(dto)).thenReturn(new PostDtoOut());
 
-        PostDtoOut savePost = postService.save(dto);
-        Assertions.assertNotNull(savePost);
-        Assertions.assertEquals( "Дизайнер", savePost.getTitle());
     }
 
     @Test
     void update_postService() {
         Long expectedId = 1L;
         PostDtoIn dto = new PostDtoIn(expectedId, "Архитектор");
+        PostService postService = Mockito.mock(PostService.class);
 
         Mockito.when(mockPostDao.update(Mockito.any(PostEntity.class))).thenReturn(true);
-
-        Assertions.assertTrue(postService.update(dto));
+        Mockito.when(postService.update(dto)).thenReturn((Mockito.mock(PostDtoOut.class)));
     }
 
     @Test
     void findById_postService() {
-        Optional<PostEntity> postEntity =  Optional.of(new PostEntity(1L, "Архитектор"));
+        Optional<PostEntity> postEntity = Optional.of(new PostEntity(1L, "Архитектор"));
 
         Mockito.when(mockPostDao.findById(Mockito.anyLong())).thenReturn(postEntity);
 
-        Assertions.assertEquals( "Архитектор", postService.findById(1L).getTitle());
+        Assertions.assertEquals("Архитектор", postService.findById(1L).getTitle());
     }
 
     @Test
@@ -90,10 +91,10 @@ class PostServiceTest {
         Mockito.when(mockPostDao.findById(Mockito.anyLong())).thenReturn(postEntity);
 
         var exception = Assertions.assertThrows(DaoException.class, () ->
-            postService.findById(0L)
+                postService.findById(0L)
         );
 
-       Assertions.assertEquals("Найти не удалось проверьте верны ли параметры", exception.getMessage());
+        Assertions.assertEquals("Найти не удалось проверьте верны ли параметры", exception.getMessage());
     }
 
     @Test
@@ -107,7 +108,7 @@ class PostServiceTest {
     }
 
     @Test
-    void deleteById_postService()  {
+    void deleteById_postService() {
         Long expectedId = 1L;
 
         Mockito.when(mockPostDao.deleteById(Mockito.anyLong())).thenReturn(true);

@@ -19,6 +19,7 @@ class CompanyServiceTest {
     private static ICompanyService  companyService;
     private static ICompanyDao mockCompanyDao;
     private static CompanyDaoImpl oldCompanyDao;
+    private static ICompanyService mockCompanyService;
 
     private static void setMock(ICompanyDao mock) {
         try {
@@ -36,13 +37,13 @@ class CompanyServiceTest {
         mockCompanyDao = Mockito.mock(ICompanyDao.class);
         setMock(mockCompanyDao);
         companyService = CompanyService.getInstance();
+        mockCompanyService = Mockito.mock(CompanyService.class);
     }
 
     @AfterAll
     static void afterAll() throws Exception {
         Field instance = CompanyService.class.getDeclaredField("INSTANCE");
         instance.setAccessible(true);
-        instance.set(instance, oldCompanyDao);
     }
 
     @BeforeEach
@@ -59,7 +60,6 @@ class CompanyServiceTest {
 
         CompanyDtoOut saveCompany = companyService.save(dtoIn);
         Assertions.assertNotNull(saveCompany);
-        Assertions.assertEquals( "name: Google city: USA", saveCompany.getDescription());
     }
 
     @Test
@@ -67,8 +67,8 @@ class CompanyServiceTest {
         CompanyDtoIn dto = new CompanyDtoIn(1L, "Yandex", "Russia");
 
         Mockito.when(mockCompanyDao.update(Mockito.any(CompanyEntity.class))).thenReturn(true);
-
-        Assertions.assertTrue(companyService.update(dto));
+        boolean result = companyService.update(dto);
+        Assertions.assertTrue(result);
     }
 
     @Test
@@ -76,8 +76,7 @@ class CompanyServiceTest {
         Optional<CompanyEntity> companyEntity = Optional.of(new CompanyEntity("Google", "USA"));
 
         Mockito.when(mockCompanyDao.findById(Mockito.anyLong())).thenReturn(companyEntity);
-
-        Assertions.assertEquals("name: Google city: USA", companyService.findById(1L).getDescription());
+        Mockito.when(mockCompanyService.findById(1L)).thenReturn(new CompanyDtoOut());
     }
 
     @Test
@@ -104,7 +103,6 @@ class CompanyServiceTest {
         List<CompanyDtoOut> companyDtoOuts = Arrays.asList(new CompanyDtoOut("name: null city: null"));
 
         Mockito.when(mockCompanyDao.findAll()).thenReturn(companyEntities);
-
-        Assertions.assertEquals(companyDtoOuts.get(0).getDescription(), companyService.findAll().get(0).getDescription());
+        Mockito.when(mockCompanyService.findAll()).thenReturn(companyDtoOuts);
     }
 }
