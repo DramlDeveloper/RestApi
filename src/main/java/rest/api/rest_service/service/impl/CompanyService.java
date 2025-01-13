@@ -7,7 +7,7 @@ import rest.api.rest_service.service.ICompanyService;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.service.dto.CompanyDtoOut;
 import rest.api.rest_service.service.mapper.ICompanyDtoMapper;
-import rest.api.rest_service.service.mapper.impl.ICompanyDtoMapperIml;
+import rest.api.rest_service.service.mapper.impl.CompanyDtoMapperIml;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class CompanyService implements ICompanyService {
     private final static CompanyService INSTANCE = new CompanyService();
     private final ICompanyDao companyDao = CompanyDaoImpl.getInstance();
-    private final ICompanyDtoMapper ICompanyDtoMapper = ICompanyDtoMapperIml.getInstance();
+    private final ICompanyDtoMapper ICompanyDtoMapper = CompanyDtoMapperIml.getInstance();
 
     public static CompanyService getInstance() {
         return INSTANCE;

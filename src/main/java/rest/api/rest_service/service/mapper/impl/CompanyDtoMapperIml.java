@@ -5,15 +5,15 @@ import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.service.dto.CompanyDtoOut;
 import rest.api.rest_service.service.mapper.ICompanyDtoMapper;
 
-public class ICompanyDtoMapperIml implements ICompanyDtoMapper {
+public class CompanyDtoMapperIml implements ICompanyDtoMapper {
 
-    private static ICompanyDtoMapperIml INSTANCE = new ICompanyDtoMapperIml();
+    private static CompanyDtoMapperIml INSTANCE = new CompanyDtoMapperIml();
 
     public static ICompanyDtoMapper getInstance() {
         return INSTANCE;
     }
 
-    private ICompanyDtoMapperIml() {
+    private CompanyDtoMapperIml() {
     }
 
     @Override
