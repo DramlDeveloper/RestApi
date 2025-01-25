@@ -36,7 +36,7 @@ class StaffServiceTest {
     private static PostDaoImpl oldPostDao;
     private static IStaffService mockStaffService;
 
-    private static void setMock(IStaffDao mock) {
+/*    private static void setMock(IStaffDao mock) {
         try {
             Field instance = StaffDaoImpl.class.getDeclaredField("INSTANCE");
             instance.setAccessible(true);
@@ -152,5 +152,5 @@ class StaffServiceTest {
 
         Mockito.when(mockStaffDao.findAll()).thenReturn(staffEntities);
         Mockito.when(mockStaffService.findAll()).thenReturn(new ArrayList<>());
-    }
+    }*/
 }

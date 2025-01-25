@@ -17,7 +17,7 @@ import static rest.api.rest_service.util.JsonHeaderUtil.jsonHeader;
 
 @WebServlet("/company")
 public class CompanyServlet extends HttpServlet {
-    private final CompanyService service = new CompanyService(CompanyDaoImpl.getInstance());
+    private final CompanyService service = CompanyService.getInstance();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void writeJson(Object value, HttpServletResponse resp) throws IOException {
@@ -48,10 +48,6 @@ public class CompanyServlet extends HttpServlet {
         if (req.getParameter("id") != null) {
             service.deleteById(Long.parseLong(req.getParameter("id")));
             resp.getWriter().write("Deleted id N " + req.getParameter("id"));
-        }
-        if (req.getParameter("id") == null) {
-            service.deleteAll();
-            resp.getWriter().write("Deleted All");
         }
     }
 

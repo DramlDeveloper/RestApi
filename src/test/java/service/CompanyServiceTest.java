@@ -1,81 +1,91 @@
 package service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import rest.api.rest_service.dao.Dao;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import rest.api.rest_service.dao.ICompanyDao;
+import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.entity.CompanyEntity;
-import rest.api.rest_service.service.impl.CompanyService;
+import rest.api.rest_service.service.ICompanyService;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.service.dto.CompanyDtoOut;
+import rest.api.rest_service.service.impl.CompanyService;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class CompanyServiceTest {
+
+    @Mock
+    private ICompanyDao companyDao;
+    @InjectMocks
     private CompanyService companyService;
-    private ICompanyDao mockCompanyDao;
+
 
     @BeforeEach
     void beforeEach() {
-        mockCompanyDao = Mockito.mock(ICompanyDao.class);
-        companyService = new CompanyService();
-        companyService.setCompanyDao(mockCompanyDao);
+        MockitoAnnotations.initMocks(this);
     }
+
 
     @Test
     void save_companyService() {
-        CompanyEntity company = new CompanyEntity(1L, "Google", "USA");
         CompanyDtoIn dtoIn = new CompanyDtoIn(1L, "Google", "USA");
+        CompanyEntity companyEntity = new CompanyEntity(1L, "Google", "USA");
 
-        Mockito.doReturn(company).when(mockCompanyDao).save(company);
-        companyService.setCompanyDao(mockCompanyDao);
-        CompanyDtoOut saveCompany = companyService.save(dtoIn);
+        Mockito.when(companyDao.save(companyEntity)).thenReturn(companyEntity);
 
-        Assertions.assertNotNull(saveCompany);
-        //  Assertions.assertEquals(1L, saveCompany.getId());
-        Assertions.assertEquals("name: Google city: USA", saveCompany.getDescription());
+        Assertions.assertEquals("name: Google city: USA", companyService.save(dtoIn).getDescription());
+        Assertions.assertEquals(1L, companyService.save(dtoIn).getId());
 
-    }
-
-    @Test
-    void update_companyService() {
-        CompanyDtoIn dto = new CompanyDtoIn(1L, "Yandex", "Russia");
-        companyService.save(dto);
-
-        boolean result = companyService.update(new CompanyDtoIn(1L, "Google", "Russia"));
-        Assertions.assertTrue(result);
     }
 
     @Test
     void findById_companyService() {
+        CompanyDtoOut company = new CompanyDtoOut(1L, "name: Google, city: USA");
+        Optional<CompanyEntity> companyEntity = Optional.of(new CompanyEntity(1L, "Google", "USA"));
 
-        CompanyDtoOut result = companyService.findById(1L);
+        Mockito.when(companyDao.findById(Mockito.anyLong())).thenReturn(companyEntity);
 
-        Assertions.assertEquals("name: Google city: Russia", result.getDescription());
+        Assertions.assertEquals("name: Google city: USA", companyService.findById(company.getId()).getDescription());
+        Assertions.assertEquals(1L, companyService.findById(company.getId()).getId());
+    }
+
+    @Test
+    void update_companyService() {
+        CompanyEntity companyEntity = new CompanyEntity(1L, "Google", "USA");
+        CompanyDtoIn dtoIn = new CompanyDtoIn(1L, "Google", "USA");
+
+        Mockito.doReturn(true).when(companyDao).update(companyEntity);
+
+        Assertions.assertTrue(companyService.update(dtoIn));
     }
 
     @Test
     void deleteById_companyService() {
         Long expectedId = 1L;
 
+        Mockito.when(companyDao.deleteById(expectedId)).thenReturn(true);
 
         Assertions.assertTrue(companyService.deleteById(expectedId));
-    }
-/*
-    @Test
-    void findByIdNotFound() {
-        Optional<CompanyEntity> companyEmpty = Optional.empty();
-
-        Mockito.when(mockCompanyDao.findById(Mockito.anyLong())).thenReturn(companyEmpty);
-
-        Assertions.assertEquals("not found", companyService.findById(5L).getDescription());
     }
 
     @Test
     void findAll_companyService() {
-        List<CompanyEntity> companyEntities = Arrays.asList(new CompanyEntity());
-        List<CompanyDtoOut> companyDtoOuts = Arrays.asList(new CompanyDtoOut("name: null city: null"));
+        Mockito.when(companyDao.findAll()).thenReturn(Arrays.asList(
+                new CompanyEntity(1L, "Toyota", "Tokio"),
+                new CompanyEntity(2L, "Lada", "Tolyatti")
+        ));
+        Assertions.assertEquals(2, companyService.findAll().size());
+        Assertions.assertEquals("name: Toyota city: Tokio", companyService.findAll().get(0).getDescription());
+        Assertions.assertEquals("name: Lada city: Tolyatti", companyService.findAll().get(1).getDescription());
 
-        Mockito.when(mockCompanyDao.findAll()).thenReturn(companyEntities);
-     //   Mockito.when(mockCompanyService.findAll()).thenReturn(companyDtoOuts);
-    }*/
+    }
 }
