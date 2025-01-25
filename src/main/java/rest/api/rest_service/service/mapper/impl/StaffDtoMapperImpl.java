@@ -17,27 +17,29 @@ public class StaffDtoMapperImpl implements IStaffDtoMapper {
 
     @Override
     public StaffDtoOut map(StaffEntity staffEntity) {
-        if (staffEntity == null) {
-            return new StaffDtoOut(
+        StaffDtoOut staffDtoOut = null;
+        if (staffEntity != null) {
+            staffDtoOut = new StaffDtoOut(
                     staffEntity.getId(),
                     staffEntity.getFirstName(),
                     staffEntity.getLastName(),
                     staffEntity.getCompany().getName(),
                     staffEntity.getPost().getTitle());
         }
-        return null;
+        return staffDtoOut;
     }
 
     @Override
     public StaffEntity map(StaffDtoIn staffDtoIn, IPostDao postDao, ICompanyDao companyDao) {
+        StaffEntity staffEntity = new StaffEntity();
         if (staffDtoIn != null) {
-            return new StaffEntity(
+            staffEntity = new StaffEntity(
                     staffDtoIn.getPostId(),
                     staffDtoIn.getFirstName(),
                     staffDtoIn.getLastName(),
                     postDao.findById(staffDtoIn.getPostId()).orElse(null),
                     companyDao.findById(staffDtoIn.getCompanyId()).orElse(null));
         }
-        return null;
+        return staffEntity;
     }
 }

@@ -10,5 +10,5 @@ public interface IPostDtoMapper {
 
     PostDtoOut mapPostDtoIn(PostDtoIn postDtoIn);
 
-    PostEntity map(PostDtoIn postDtoOut);
+    PostEntity map(PostDtoIn postDtoIn);
 }

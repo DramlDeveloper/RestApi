@@ -32,15 +32,10 @@ public class PostService implements IPostService {
     }
 
     public PostDtoOut findById(Long id) {
-        try {
             return postDao.findById(id).stream()
                     .map(postDtoMapper::map)
                     .findAny()
-                    .orElseThrow();
-        } catch (NoSuchElementException e) {
-            throw new DaoException("Найти не удалось проверьте верны ли параметры");
-        }
-
+                    .orElse(new PostDtoOut(0L, "not found"));
     }
 
     public PostDtoOut save(PostDtoIn postDtoIn) {

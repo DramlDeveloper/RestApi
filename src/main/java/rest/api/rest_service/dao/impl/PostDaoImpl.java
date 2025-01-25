@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -93,7 +92,7 @@ public class PostDaoImpl implements IPostDao {
                 postEntity = builderPostEntity(resultSet);
             }
             return Optional.ofNullable(postEntity);
-        } catch (SQLException | NoSuchElementException e) {
+        } catch (SQLException e) {
             throw new DaoException("Найти не удалось проверьте верны ли параметры");
         }
     }

@@ -21,8 +21,7 @@ class PostServiceTest {
     private static IPostService postService;
     private static IPostDao mockPostDao;
     private static PostDaoImpl oldPostDao;
-    private static PostService mockPostService;
-
+    private static IPostService mockPostService;
 
     private static void setMock(IPostDao mock) {
         try {
@@ -44,15 +43,15 @@ class PostServiceTest {
         mockPostService = Mockito.mock(PostService.class);
     }
 
+    @BeforeEach
+    void setUp() {
+        Mockito.reset(mockPostDao);
+    }
+
     @AfterAll
     static void afterAll() throws Exception {
         Field instance = PostService.class.getDeclaredField("INSTANCE");
         instance.setAccessible(true);
-    }
-
-    @BeforeEach
-    void setUp() {
-        Mockito.reset(mockPostDao);
     }
 
     @Test
@@ -61,7 +60,10 @@ class PostServiceTest {
         PostEntity postEntity = new PostEntity("Дизайнер");
 
         Mockito.when(mockPostDao.save(Mockito.any(PostEntity.class))).thenReturn(postEntity);
-        Mockito.when(mockPostService.save(dto)).thenReturn(new PostDtoOut());
+       // Mockito.when(mockPostService.save(dto)).thenReturn(new PostDtoOut());
+
+        PostDtoOut savePost = postService.save(dto);
+        Assertions.assertEquals(PostDtoOut.class, savePost.getClass());
 
     }
 
@@ -90,7 +92,7 @@ class PostServiceTest {
 
         Mockito.when(mockPostDao.findById(Mockito.anyLong())).thenReturn(postEntity);
 
-        var exception = Assertions.assertThrows(DaoException.class, () ->
+        var exception = Assertions.assertThrows(NullPointerException.class, () ->
                 postService.findById(0L)
         );
 

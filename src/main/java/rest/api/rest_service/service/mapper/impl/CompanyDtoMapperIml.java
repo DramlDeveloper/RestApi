@@ -27,12 +27,13 @@ public class CompanyDtoMapperIml implements ICompanyDtoMapper {
 
     @Override
     public CompanyDtoOut map(CompanyEntity companyEntity) {
+        CompanyDtoOut companyDtoOut = new CompanyDtoOut();
         if (companyEntity != null) {
-            new CompanyDtoOut(companyEntity.getId(),
+        companyDtoOut =    new CompanyDtoOut(companyEntity.getId(),
                     "name: %s city: %s".formatted(
                             companyEntity.getName(),
                             companyEntity.getCity()));
         }
-        return null;
+        return companyDtoOut;
     }
 }

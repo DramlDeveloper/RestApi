@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
+import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.service.impl.CompanyService;
 
@@ -16,7 +17,7 @@ import static rest.api.rest_service.util.JsonHeaderUtil.jsonHeader;
 
 @WebServlet("/company")
 public class CompanyServlet extends HttpServlet {
-    private final CompanyService service = CompanyService.getInstance();
+    private final CompanyService service = new CompanyService(CompanyDaoImpl.getInstance());
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void writeJson(Object value, HttpServletResponse resp) throws IOException {

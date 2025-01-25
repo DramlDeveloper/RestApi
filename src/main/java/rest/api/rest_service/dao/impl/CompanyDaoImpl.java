@@ -78,15 +78,14 @@ public class CompanyDaoImpl implements ICompanyDao {
 
     public Optional<CompanyEntity> findById(Long id, Connection connection) {
         CompanyEntity company = null;
-        // Здесь используем try with resources
         try (var statement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             statement.setLong(1, id);
             var result = statement.executeQuery();
             if (result.next()) {
                 company = builderCompanyEntity(result);
             }
-            return Optional.ofNullable(company);
-        } catch (SQLException e) {
+            return Optional.of(company);
+        } catch (SQLException | NullPointerException e) {
             throw new DaoException("Найти не удалось проверьте верны ли параметры");
         }
     }

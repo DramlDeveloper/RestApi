@@ -13,16 +13,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CompanyService implements ICompanyService {
-    private final static CompanyService INSTANCE = new CompanyService();
-    private final ICompanyDao companyDao = CompanyDaoImpl.getInstance();
+  //  private final static CompanyService INSTANCE = new CompanyService();
+    private  ICompanyDao companyDao;
     private final ICompanyDtoMapper ICompanyDtoMapper = CompanyDtoMapperIml.getInstance();
 
+/*
     public static CompanyService getInstance() {
         return INSTANCE;
     }
+*/
+public CompanyService(ICompanyDao companyDao) {
+    this.companyDao = companyDao;
+}
 
+    public CompanyService() {
+    }
 
-    private CompanyService() {
+    public void setCompanyDao(ICompanyDao companyDao) {
+        this.companyDao = companyDao;
     }
 
     public List<CompanyDtoOut> findAll() {
