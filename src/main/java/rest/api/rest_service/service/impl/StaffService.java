@@ -19,67 +19,50 @@ import java.util.List;
 public class StaffService implements IStaffService {
 
     private final static StaffService INSTANCE = new StaffService();
-    private final IStaffDao staffDao = StaffDaoImpl.getInstance();
-    private final ICompanyDao companyDao = CompanyDaoImpl.getInstance();
-    private final IPostDao postDao = PostDaoImpl.getInstance();
-    private final IStaffDtoMapper staffDtoMapper = StaffDtoMapperImpl.getInstance();
+    private  IStaffDao staffDao = StaffDaoImpl.getInstance();
+    private  ICompanyDao companyDao = CompanyDaoImpl.getInstance();
+    private  IPostDao postDao = PostDaoImpl.getInstance();
+    private  final IStaffDtoMapper staffDtoMapper = StaffDtoMapperImpl.getInstance();
 
     public static StaffService getInstance() {
         return INSTANCE;
     }
 
-    private StaffService() {
+    public StaffService() {
     }
 
     public List<StaffDtoOut> findAll() {
-        try {
             return staffDao.findAll().stream()
                     .map(staffDtoMapper::map).toList();
-        } catch (Exception e) {
-            throw new DaoException("Data not found");
         }
 
-    }
-
     public StaffDtoOut findById(Long id) {
-        StaffDtoOut staffDtoOut;
-        try {
-            staffDtoOut = staffDao.findById(id).stream()
+            return staffDao.findById(id).stream()
                     .map(staffDtoMapper::map)
                     .findAny()
                     .orElse(null);
-        } catch (Exception e) {
-            throw new DaoException("the ID does not exist");
-        }
-        return staffDtoOut;
+
     }
 
     public boolean save(StaffDtoIn staffDtoIn) {
-        if (staffDtoIn != null) {
-            staffDao.save(staffDtoMapper.map(staffDtoIn, postDao, companyDao));
+        StaffEntity staffEntity;
+        if(staffDtoIn != null) {
+            staffEntity = staffDtoMapper.map(staffDtoIn, postDao, companyDao);
+            staffDao.save(staffEntity);
             return true;
         }
         return false;
     }
 
     public boolean deleteById(Long id) {
-        return staffDao.deleteById(id);
-    }
-
-    public void deleteAll() {
-        for (StaffEntity staffEntity : staffDao.findAll()) {
-            staffDao.deleteById(staffEntity.getId());
+        if (id != null){
+            return staffDao.deleteById(id);
         }
+        return false;
     }
 
     public StaffDtoOut update(StaffDtoIn staffDtoIn) {
-
-        if (staffDtoIn != null
-                && postDao.findById(staffDtoIn.getPostId()).isPresent()
-                && companyDao.findById(staffDtoIn.getCompanyId()).isPresent()) {
             staffDao.update(staffDtoMapper.map(staffDtoIn, postDao, companyDao));
             return findById(staffDtoIn.getId());
-        }
-        return null;
     }
 }

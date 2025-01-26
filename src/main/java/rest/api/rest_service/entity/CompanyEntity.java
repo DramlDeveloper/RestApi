@@ -10,9 +10,6 @@ public class CompanyEntity {
     private String name;
     private String city;
 
-    public CompanyEntity() {
-    }
-
     public CompanyEntity(Long id, String name, String city) {
         this.id = id;
         this.name = name;
@@ -53,15 +50,5 @@ public class CompanyEntity {
         if (o == null || getClass() != o.getClass()) return false;
         CompanyEntity that = (CompanyEntity) o;
         return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(city, that.city);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, city);
-    }
-
-    @Override
-    public String toString() {
-        return "Company{ id = " +id + ", name = " + name + ", address = " + city + " }";
     }
 }

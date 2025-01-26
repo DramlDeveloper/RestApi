@@ -1,156 +1,103 @@
 package service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import rest.api.rest_service.dao.ICompanyDao;
 import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.dao.IStaffDao;
-import rest.api.rest_service.dao.impl.CompanyDaoImpl;
-import rest.api.rest_service.dao.impl.PostDaoImpl;
-import rest.api.rest_service.dao.impl.StaffDaoImpl;
 import rest.api.rest_service.entity.CompanyEntity;
 import rest.api.rest_service.entity.PostEntity;
 import rest.api.rest_service.entity.StaffEntity;
-import rest.api.rest_service.exception.DaoException;
-import rest.api.rest_service.service.IStaffService;
 import rest.api.rest_service.service.dto.StaffDtoIn;
 import rest.api.rest_service.service.dto.StaffDtoOut;
 import rest.api.rest_service.service.impl.CompanyService;
 import rest.api.rest_service.service.impl.PostService;
 import rest.api.rest_service.service.impl.StaffService;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+public class StaffServiceTest {
+    StaffDtoIn staffDtoIn = new StaffDtoIn(1L, "Jon", "Forest", 1L, 1L);
+    StaffDtoOut staffDtoOut = new StaffDtoOut(1L, "Jon", "Forest", "Google", "Дизайнер");
+    PostEntity postEntity = new PostEntity(1L, "Дизайнер");
+    CompanyEntity companyEntity = new CompanyEntity(1L, "Google", "USA");
+    StaffEntity staffEntity = new StaffEntity("Jon", "Forest", postEntity, companyEntity);
 
-class StaffServiceTest {
-    private static IStaffService staffService;
-    private static IStaffDao mockStaffDao;
-    private static StaffDaoImpl oldStaffDao;
-    private static ICompanyDao mockCompanyDao;
-    private static CompanyDaoImpl oldCompanyDao;
-    private static IPostDao mockPostDao;
-    private static PostDaoImpl oldPostDao;
-    private static IStaffService mockStaffService;
+    @Mock
+    private IStaffDao staffDao;
+    @Mock
+    private ICompanyDao companyDao;
+    @Mock
+    private IPostDao postDao;
 
-/*    private static void setMock(IStaffDao mock) {
-        try {
-            Field instance = StaffDaoImpl.class.getDeclaredField("INSTANCE");
-            instance.setAccessible(true);
-            oldStaffDao = (StaffDaoImpl) instance.get(instance);
-            instance.set(instance, mock);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void setMock(ICompanyDao mock) {
-        try {
-            Field instance = CompanyDaoImpl.class.getDeclaredField("INSTANCE");
-            instance.setAccessible(true);
-            oldCompanyDao = (CompanyDaoImpl) instance.get(instance);
-            instance.set(instance, mock);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void setMock(IPostDao mock) {
-        try {
-            Field instance = PostDaoImpl.class.getDeclaredField("INSTANCE");
-            instance.setAccessible(true);
-            oldPostDao = (PostDaoImpl) instance.get(instance);
-            instance.set(instance, mock);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @BeforeAll
-    static void beforeAll() {
-        mockStaffDao = Mockito.mock(IStaffDao.class);
-        setMock(mockStaffDao);
-
-        mockCompanyDao = Mockito.mock(ICompanyDao.class);
-        setMock(mockCompanyDao);
-
-        mockPostDao = Mockito.mock(IPostDao.class);
-        setMock(mockPostDao);
-
-        staffService = StaffService.getInstance();
-        mockStaffService = Mockito.mock(IStaffService.class);
-    }
-
-    @AfterAll
-    static void afterAll() throws Exception {
-        Field instance = StaffService.class.getDeclaredField("INSTANCE");
-        instance.setAccessible(true);
-
-        instance = CompanyService.class.getDeclaredField("INSTANCE");
-        instance.setAccessible(true);
-
-        instance = PostService.class.getDeclaredField("INSTANCE");
-        instance.setAccessible(true);
-    }
+    @InjectMocks
+    private StaffService staffService;
+    @InjectMocks
+    private CompanyService companyService;
+    @InjectMocks
+    private PostService postService;
 
     @BeforeEach
-    void setUp() {
-        Mockito.reset(mockStaffDao);
-    }
-
+    void setUp() {MockitoAnnotations.initMocks(this);}
 
     @Test
     void save_staffService() {
-        PostEntity postEntity = new PostEntity(1L, "Дизайнер");
-        CompanyEntity companyEntity = new CompanyEntity(1L, "Google", "USA");
-        StaffEntity staffEntity = new StaffEntity("Jon", "Forest", postEntity, companyEntity);
-        StaffDtoIn dto = new StaffDtoIn(1L, "Jon", "Forest", 1L, 1L);
+        Mockito.when(staffDao.save(staffEntity)).thenReturn(staffEntity);
 
-        Mockito.doReturn(staffEntity).when(mockStaffDao).save(Mockito.any(StaffEntity.class));
-        Mockito.when(mockCompanyDao.save(Mockito.any(CompanyEntity.class))).thenReturn(companyEntity);
-        Mockito.when(mockPostDao.save(Mockito.any(PostEntity.class))).thenReturn(postEntity);
-
-        Assertions.assertTrue(staffService.save(dto));
-
+        Assertions.assertTrue(staffService.save(staffDtoIn));
+        Assertions.assertFalse(staffService.save(null));
     }
 
     @Test
     void update_staffService() {
-        StaffDtoIn dto = new StaffDtoIn(1L, "Kely", "Moren", 1L, 1L);
-        StaffService staffService = Mockito.mock(StaffService.class);
+        Mockito.when(staffDao.findById(Mockito.anyLong())).thenReturn(Optional.of(staffEntity));
 
-        Mockito.when(mockStaffDao.update(Mockito.any(StaffEntity.class))).thenReturn(true);
-        Mockito.when(staffService.update(dto)).thenReturn(Mockito.mock(StaffDtoOut.class));
-
+        Assertions.assertEquals(staffDtoOut.getFirstName(), staffService.update(staffDtoIn).getFirstName());
+        Assertions.assertEquals(staffDtoOut.getLastName(), staffService.update(staffDtoIn).getLastName());
+        Assertions.assertEquals(staffDtoOut.getNameCompany(), staffService.update(staffDtoIn).getNameCompany());
+        Assertions.assertEquals(staffDtoOut.getTitlePost(), staffService.update(staffDtoIn).getTitlePost());
     }
 
     @Test
-    void findById_staffServiceNotFound() {
+    void findById_staffService() {
         Long expectedId = 1L;
-        Optional<StaffEntity> staffEntity = Optional.of(new StaffEntity());
 
-        Mockito.when(mockStaffDao.findById(Mockito.anyLong())).thenReturn(staffEntity);
+        Mockito.when(staffDao.findById(Mockito.anyLong())).thenReturn(Optional.of(staffEntity));
 
-        Assertions.assertThrows(DaoException.class, () -> staffService.findById(expectedId));
+        Assertions.assertEquals(staffDtoOut.getFirstName(), staffService.findById(expectedId).getFirstName());
+        Assertions.assertEquals(staffDtoOut.getLastName(), staffService.findById(expectedId).getLastName());
+        Assertions.assertEquals(staffDtoOut.getNameCompany(), staffService.findById(expectedId).getNameCompany());
+        Assertions.assertEquals(staffDtoOut.getTitlePost(), staffService.findById(expectedId).getTitlePost());
     }
 
     @Test
     void deleteById_staffService() {
         Long expectedId = 1L;
 
-        Mockito.when(mockStaffDao.deleteById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(staffDao.deleteById(Mockito.anyLong())).thenReturn(true);
 
         Assertions.assertTrue(staffService.deleteById(expectedId));
+        Assertions.assertFalse(staffService.deleteById(null));
     }
 
     @Test
     void findAll_postService() {
-        List<StaffEntity> staffEntities = Arrays.asList(new StaffEntity());
+        List<StaffEntity> staffEntities = Arrays.asList(
+                staffEntity,
+                staffEntity
+        );
 
-        Mockito.when(mockStaffDao.findAll()).thenReturn(staffEntities);
-        Mockito.when(mockStaffService.findAll()).thenReturn(new ArrayList<>());
-    }*/
+        Mockito.when(staffDao.findAll()).thenReturn(staffEntities);
+        Assertions.assertEquals(2, staffService.findAll().size());
+        Assertions.assertEquals(staffEntity.getFirstName(), staffService.findAll().get(0).getFirstName());
+        Assertions.assertEquals(staffEntity.getLastName(), staffService.findAll().get(1).getLastName());
+        Assertions.assertEquals(staffEntity.getId(), staffService.findAll().get(0).getId());
+    }
 }

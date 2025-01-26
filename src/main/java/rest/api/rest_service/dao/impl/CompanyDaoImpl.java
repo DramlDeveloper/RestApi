@@ -98,8 +98,7 @@ public class CompanyDaoImpl implements ICompanyDao {
             List<CompanyEntity> companyEntityList = new ArrayList<>();
             var result = statement.executeQuery();
             while (result.next()) {
-                companyEntityList.add(builderCompanyEntity(result)
-                );
+                companyEntityList.add(builderCompanyEntity(result));
             }
             return companyEntityList;
         } catch (SQLException e) {

@@ -3,22 +3,17 @@ package service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import rest.api.rest_service.dao.ICompanyDao;
-import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.entity.CompanyEntity;
-import rest.api.rest_service.service.ICompanyService;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
 import rest.api.rest_service.service.dto.CompanyDtoOut;
 import rest.api.rest_service.service.impl.CompanyService;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 public class CompanyServiceTest {
@@ -28,12 +23,10 @@ public class CompanyServiceTest {
     @InjectMocks
     private CompanyService companyService;
 
-
     @BeforeEach
-    void beforeEach() {
+    void setUp() {
         MockitoAnnotations.initMocks(this);
     }
-
 
     @Test
     void save_companyService() {
@@ -44,7 +37,6 @@ public class CompanyServiceTest {
 
         Assertions.assertEquals("name: Google city: USA", companyService.save(dtoIn).getDescription());
         Assertions.assertEquals(1L, companyService.save(dtoIn).getId());
-
     }
 
     @Test

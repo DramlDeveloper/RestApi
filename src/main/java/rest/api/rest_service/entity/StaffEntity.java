@@ -42,24 +42,12 @@ public class StaffEntity {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     public PostEntity getPost() {
         return post;
-    }
-
-    public void setPost(PostEntity post) {
-        this.post = post;
     }
 
     public CompanyEntity getCompany() {
@@ -78,15 +66,5 @@ public class StaffEntity {
                              && Objects.equals(lastName, that.lastName)
                              && Objects.equals(post, that.post)
                              && Objects.equals(company, that.company);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstName, lastName, post, company);
-    }
-
-    @Override
-    public String toString() {
-        return id + " " + firstName + " " + lastName + " " + post + " " + company;
     }
 }

@@ -16,7 +16,6 @@ import rest.api.rest_service.service.impl.PostService;
 import java.util.Arrays;
 import java.util.Optional;
 
-
 public class PostServiceTest {
     PostDtoIn dtoIn = new PostDtoIn(1L, "Дизайнер");
     PostDtoOut dtoOut = new PostDtoOut(1L, "Дизайнер");
@@ -28,11 +27,9 @@ public class PostServiceTest {
     private PostService postService;
 
     @BeforeEach
-    void beforeEach() {
+    void setUp() {
         MockitoAnnotations.initMocks(this);
-
     }
-
 
     @Test
     void save_postService() {
@@ -66,7 +63,6 @@ public class PostServiceTest {
         PostDtoOut notFound = new PostDtoOut(0L, "not found");
 
         Assertions.assertEquals(notFound.getTitle(), postService.update(null).getTitle());
-
     }
 
     @Test

@@ -26,7 +26,7 @@ public class CompanyServlet extends HttpServlet {
 
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         jsonHeader(resp);
         if (req.getParameter("id") != null) {
             writeJson(service.findById(Long.parseLong(req.getParameter("id"))), resp);

@@ -1,6 +1,7 @@
 package rest.api.rest_service.service.impl;
 
 import rest.api.rest_service.dao.ICompanyDao;
+import rest.api.rest_service.dao.impl.CompanyDaoImpl;
 import rest.api.rest_service.entity.CompanyEntity;
 import rest.api.rest_service.service.ICompanyService;
 import rest.api.rest_service.service.dto.CompanyDtoIn;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class CompanyService implements ICompanyService {
     private final static CompanyService INSTANCE = new CompanyService();
-    private  ICompanyDao companyDao;
+    private  ICompanyDao companyDao = CompanyDaoImpl.getInstance();
     private final ICompanyDtoMapper iCompanyDtoMapper = CompanyDtoMapperIml.getInstance();
 
     public static CompanyService getInstance() {
@@ -25,7 +26,7 @@ public class CompanyService implements ICompanyService {
 
     public List<CompanyDtoOut> findAll() {
         return companyDao.findAll().stream()
-                .map(iCompanyDtoMapper::map).collect(Collectors.toList());
+                .map(iCompanyDtoMapper::map).toList();
     }
 
     public CompanyDtoOut findById(Long id) {

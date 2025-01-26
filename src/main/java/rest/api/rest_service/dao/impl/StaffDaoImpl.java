@@ -24,8 +24,8 @@ public class StaffDaoImpl implements IStaffDao {
         return INSTANCE;
     }
 
-    ICompanyDao companyDao = CompanyDaoImpl.getInstance();
-    IPostDao postDao = PostDaoImpl.getInstance();
+    public ICompanyDao companyDao = CompanyDaoImpl.getInstance();
+    public IPostDao postDao = PostDaoImpl.getInstance();
 
     private StaffDaoImpl() {
     }
@@ -62,8 +62,8 @@ public class StaffDaoImpl implements IStaffDao {
 
     @Override
     public StaffEntity save(StaffEntity staffEntity) {
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, staffEntity.getFirstName());
             preparedStatement.setString(2, staffEntity.getLastName());
             preparedStatement.setLong(3, staffEntity.getCompany().getId());
@@ -73,30 +73,28 @@ public class StaffDaoImpl implements IStaffDao {
             if (keys.next()) {
                 staffEntity.setId(keys.getLong("id"));
             }
-            return staffEntity;
         } catch (SQLException e) {
             throw new DaoException("Сохранить не удалось проверьте верны ли параметры");
         }
+        return staffEntity;
     }
 
     @Override
     public Optional<StaffEntity> findById(Long id) {
         StaffEntity staffEntity = null;
-
         try (Connection connection = ConnectionManager.get();
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
-
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 staffEntity = builderStaff(resultSet);
             }
-            return Optional.ofNullable(staffEntity);
+
         } catch (SQLException e) {
             throw new DaoException("Найти не удалось проверьте верны ли параметры");
         }
-
+        return Optional.ofNullable(staffEntity);
     }
 
     @Override
@@ -149,7 +147,6 @@ public class StaffDaoImpl implements IStaffDao {
                 resultSet.getString("first_name"),
                 resultSet.getString("last_name"),
                 postDao.findById(resultSet.getLong("post_id")).orElse(null),
-                companyDao.findById(resultSet.getLong("company_id"))
-                       .orElse(null));
+                companyDao.findById(resultSet.getLong("company_id")).orElse(null));
     }
 }
