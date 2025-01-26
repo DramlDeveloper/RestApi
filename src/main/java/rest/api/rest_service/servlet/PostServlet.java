@@ -48,10 +48,6 @@ public class PostServlet extends HttpServlet {
             service.deleteById(Long.parseLong(req.getParameter("id")));
             resp.getWriter().write("Deleted id N " + req.getParameter("id"));
         }
-        if (req.getParameter("id") == null) {
-            service.deleteAll();
-            resp.getWriter().write("Deleted All");
-        }
     }
 
     @Override

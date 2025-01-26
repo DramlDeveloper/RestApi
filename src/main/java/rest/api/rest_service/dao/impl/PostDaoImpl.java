@@ -51,13 +51,6 @@ public class PostDaoImpl implements IPostDao {
             WHERE id = ?
             """;
 
-
-    private PostEntity builderPostEntity(ResultSet resultSet) throws SQLException {
-        return new PostEntity(
-                resultSet.getLong("id"),
-                resultSet.getString("title"));
-    }
-
     @Override
     public PostEntity save(PostEntity postEntity) {
         try (Connection connection = ConnectionManager.get();
@@ -99,15 +92,14 @@ public class PostDaoImpl implements IPostDao {
 
     @Override
     public List<PostEntity> findAll() {
-        try (Connection connection = ConnectionManager.get();
+        try (var connection = ConnectionManager.get();
              var statement = connection.prepareStatement(FIND_ALL_SQL)) {
+            List<PostEntity> postEntityArrayList = new ArrayList<>();
             var resultSet = statement.executeQuery();
-            List<PostEntity> postEntities = new ArrayList<>();
-
             while (resultSet.next()) {
-                postEntities.add(builderPostEntity(resultSet));
+                postEntityArrayList.add(builderPostEntity(resultSet));
             }
-            return postEntities;
+            return postEntityArrayList;
         } catch (SQLException e) {
             throw new DaoException("Данные отсутствуют");
         }
@@ -134,5 +126,11 @@ public class PostDaoImpl implements IPostDao {
         } catch (SQLException e) {
             throw new DaoException("Удалить не удалось проверьте верны ли параметры");
         }
+    }
+
+    private PostEntity builderPostEntity(ResultSet resultSet) throws SQLException {
+        return new PostEntity(
+                resultSet.getLong("id"),
+                resultSet.getString("title"));
     }
 }

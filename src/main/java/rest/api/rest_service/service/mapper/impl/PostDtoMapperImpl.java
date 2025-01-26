@@ -15,31 +15,28 @@ public class PostDtoMapperImpl implements IPostDtoMapper {
 
     @Override
     public PostDtoOut map(PostEntity postEntity) {
+        PostDtoOut postDtoOut = new PostDtoOut();
         if (postEntity != null) {
-            return new PostDtoOut(
+            postDtoOut = new PostDtoOut(
                     postEntity.getId(),
                     postEntity.getTitle());
-
         }
-        return null;
+        return postDtoOut;
     }
 
     @Override
     public PostDtoOut mapPostDtoIn(PostDtoIn postDtoIn) {
-        if (postDtoIn != null) {
             return new PostDtoOut(
                     postDtoIn.getId(),
                     postDtoIn.getTitle()
             );
-        }
-        return null;
     }
 
     @Override
     public PostEntity map(PostDtoIn postDtoIn) {
-            return new PostEntity(
-                    postDtoIn.getId(),
-                    postDtoIn.getTitle()
-            );
+        return new PostEntity(
+                postDtoIn.getId(),
+                postDtoIn.getTitle()
+        );
     }
 }

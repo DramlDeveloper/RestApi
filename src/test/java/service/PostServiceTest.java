@@ -1,120 +1,90 @@
 package service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import rest.api.rest_service.dao.IPostDao;
-import rest.api.rest_service.dao.impl.PostDaoImpl;
 import rest.api.rest_service.entity.PostEntity;
-import rest.api.rest_service.exception.DaoException;
-import rest.api.rest_service.service.IPostService;
 import rest.api.rest_service.service.dto.PostDtoIn;
 import rest.api.rest_service.service.dto.PostDtoOut;
 import rest.api.rest_service.service.impl.PostService;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 
-class PostServiceTest {
-    private static IPostService postService;
-    private static IPostDao mockPostDao;
-    private static PostDaoImpl oldPostDao;
-    private static IPostService mockPostService;
-/*
-    private static void setMock(IPostDao mock) {
-        try {
-            Field instance = PostDaoImpl.class.getDeclaredField("INSTANCE");
-            instance.setAccessible(true);
-            oldPostDao = (PostDaoImpl) instance.get(instance);
-            instance.set(instance, mock);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+public class PostServiceTest {
+    PostDtoIn dtoIn = new PostDtoIn(1L, "Дизайнер");
+    PostDtoOut dtoOut = new PostDtoOut(1L, "Дизайнер");
+    PostEntity postEntity = new PostEntity(1L, "Дизайнер");
 
-
-    @BeforeAll
-    static void beforeAll() {
-        mockPostDao = Mockito.mock(IPostDao.class);
-        setMock(mockPostDao);
-        postService = PostService.getInstance();
-        mockPostService = Mockito.mock(PostService.class);
-    }
+    @Mock
+    private IPostDao postDao;
+    @InjectMocks
+    private PostService postService;
 
     @BeforeEach
-    void setUp() {
-        Mockito.reset(mockPostDao);
+    void beforeEach() {
+        MockitoAnnotations.initMocks(this);
+
     }
 
-    @AfterAll
-    static void afterAll() throws Exception {
-        Field instance = PostService.class.getDeclaredField("INSTANCE");
-        instance.setAccessible(true);
-    }
 
     @Test
     void save_postService() {
-        PostDtoIn dto = new PostDtoIn("Дизайнер");
-        PostEntity postEntity = new PostEntity("Дизайнер");
+        Mockito.when(postDao.save(postEntity)).thenReturn(postEntity);
 
-        Mockito.when(mockPostDao.save(Mockito.any(PostEntity.class))).thenReturn(postEntity);
-       // Mockito.when(mockPostService.save(dto)).thenReturn(new PostDtoOut());
+        Assertions.assertEquals("Дизайнер", postService.save(dtoIn).getTitle());
+        Assertions.assertEquals(1L, postService.save(dtoIn).getId());
 
-        PostDtoOut savePost = postService.save(dto);
-        Assertions.assertEquals(PostDtoOut.class, savePost.getClass());
+    }
+    @Test
+    void findById_postService() {
+        Optional<PostEntity> postEntityOptional = Optional.of(new PostEntity(1L, "Дизайнер"));
 
+        Mockito.when(postDao.findById(Mockito.anyLong())).thenReturn(postEntityOptional);
+
+        Assertions.assertEquals("Дизайнер", postService.findById(dtoOut.getId()).getTitle());
+        Assertions.assertEquals(1L, postService.findById(dtoOut.getId()).getId());
     }
 
     @Test
     void update_postService() {
-        Long expectedId = 1L;
-        PostDtoIn dto = new PostDtoIn(expectedId, "Архитектор");
-        PostService postService = Mockito.mock(PostService.class);
+        Mockito.doReturn(true).when(postDao).update(postEntity);
 
-        Mockito.when(mockPostDao.update(Mockito.any(PostEntity.class))).thenReturn(true);
-        Mockito.when(postService.update(dto)).thenReturn((Mockito.mock(PostDtoOut.class)));
+        Assertions.assertEquals(dtoOut.getTitle(), postService.update(dtoIn).getTitle());
+        Assertions.assertEquals(dtoOut.getId(), postService.update(dtoIn).getId());
     }
 
     @Test
-    void findById_postService() {
-        Optional<PostEntity> postEntity = Optional.of(new PostEntity(1L, "Архитектор"));
+    void update_postServiceNotFound() {
+        Mockito.doReturn(true).when(postDao).update(postEntity);
+        PostDtoOut notFound = new PostDtoOut(0L, "not found");
 
-        Mockito.when(mockPostDao.findById(Mockito.anyLong())).thenReturn(postEntity);
+        Assertions.assertEquals(notFound.getTitle(), postService.update(null).getTitle());
 
-        Assertions.assertEquals("Архитектор", postService.findById(1L).getTitle());
-    }
-
-    @Test
-    void findByIdNotFound() {
-        Optional<PostEntity> postEntity = Optional.empty();
-
-        Mockito.when(mockPostDao.findById(Mockito.anyLong())).thenReturn(postEntity);
-
-        var exception = Assertions.assertThrows(NullPointerException.class, () ->
-                postService.findById(0L)
-        );
-
-        Assertions.assertEquals("Найти не удалось проверьте верны ли параметры", exception.getMessage());
-    }
-
-    @Test
-    void findAll_postService() {
-        List<PostEntity> postEntities = Arrays.asList(new PostEntity());
-        List<PostDtoOut> postDtoOuts = Arrays.asList(new PostDtoOut());
-
-        Mockito.when(mockPostDao.findAll()).thenReturn(postEntities);
-
-        Assertions.assertEquals(postDtoOuts.get(0).getTitle(), postService.findAll().get(0).getTitle());
     }
 
     @Test
     void deleteById_postService() {
         Long expectedId = 1L;
 
-        Mockito.when(mockPostDao.deleteById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(postDao.deleteById(expectedId)).thenReturn(true);
 
         Assertions.assertTrue(postService.deleteById(expectedId));
-    }*/
+    }
+
+    @Test
+    void findAll_postService() {
+        Mockito.when(postDao.findAll()).thenReturn(Arrays.asList(
+                new PostEntity(2L, "Дизайнер"),
+                new PostEntity(3L, "Архитектор")
+        ));
+
+        Assertions.assertEquals(2, postService.findAll().size());
+    }
 }

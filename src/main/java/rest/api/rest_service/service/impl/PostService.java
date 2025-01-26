@@ -2,8 +2,6 @@ package rest.api.rest_service.service.impl;
 
 import rest.api.rest_service.dao.IPostDao;
 import rest.api.rest_service.dao.impl.PostDaoImpl;
-import rest.api.rest_service.entity.PostEntity;
-import rest.api.rest_service.exception.DaoException;
 import rest.api.rest_service.service.IPostService;
 import rest.api.rest_service.service.dto.PostDtoIn;
 import rest.api.rest_service.service.dto.PostDtoOut;
@@ -11,11 +9,10 @@ import rest.api.rest_service.service.mapper.IPostDtoMapper;
 import rest.api.rest_service.service.mapper.impl.PostDtoMapperImpl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class PostService implements IPostService {
     private final static PostService INSTANCE = new PostService();
-    private final IPostDao postDao = PostDaoImpl.getInstance();
+    private IPostDao postDao = PostDaoImpl.getInstance();
     private final IPostDtoMapper postDtoMapper = PostDtoMapperImpl.getINSTANCE();
 
     public static PostService getInstance() {
@@ -23,7 +20,7 @@ public class PostService implements IPostService {
     }
 
 
-    private PostService() {
+    public PostService() {
     }
 
     public List<PostDtoOut> findAll() {
@@ -39,18 +36,11 @@ public class PostService implements IPostService {
     }
 
     public PostDtoOut save(PostDtoIn postDtoIn) {
-        var id = postDao.save(postDtoMapper.map(postDtoIn)).getId();
-        return findById(id);
+       return postDtoMapper.map( postDao.save(postDtoMapper.map(postDtoIn)));
     }
 
     public boolean deleteById(Long id) {
         return postDao.deleteById(id);
-    }
-
-    public void deleteAll() {
-        for (PostEntity postEntity : postDao.findAll()) {
-            postDao.deleteById(postEntity.getId());
-        }
     }
 
     public PostDtoOut update(PostDtoIn postDtoIn) {

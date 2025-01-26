@@ -6,9 +6,6 @@ public class PostEntity {
     private  Long id;
     private  String title;
 
-    public PostEntity() {
-    }
-
     public PostEntity(String title) {
         this.title = title;
     }
@@ -39,18 +36,5 @@ public class PostEntity {
         if (o == null || getClass() != o.getClass()) return false;
         PostEntity that = (PostEntity) o;
         return Objects.equals(id, that.id) && Objects.equals(title, that.title);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title);
-    }
-
-    @Override
-    public String toString() {
-        return "PostEntity{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                '}';
     }
 }
